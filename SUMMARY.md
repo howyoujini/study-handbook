@@ -1,6 +1,6 @@
 # Table of contents
 
-* [👋 안녕하세요](README.md)
+* [👋 안녕하세요, 홍유진입니다](README.md)
 
 ## CS
 
