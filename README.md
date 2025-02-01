@@ -1,11 +1,6 @@
 ---
 description: 저에 대해 간단하게 소개하겠습니다.
-cover: .gitbook/assets/Group 269.png
-coverY: 0
 layout:
-  cover:
-    visible: true
-    size: full
   title:
     visible: true
   description:
