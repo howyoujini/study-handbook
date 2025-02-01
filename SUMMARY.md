@@ -4,4 +4,5 @@
 
 ## CS
 
-* [싱글톤 패턴](cs/undefined.md)
+* [디자인 패턴](cs/undefined/README.md)
+  * [싱글톤 패턴](cs/undefined/undefined.md)
