@@ -393,9 +393,6 @@ console.log(instance2.config.theme); // "light" (예상과 다르게 변경됨)
 
 ➡ 문제: instance1에서 테마를 변경했더니 instance2에도 영향을 줌.
 
-\
-
-
 
 
 • 전역 상태를 직접 변경하지 않고, Immutable(불변) 상태 관리 기법을 적용.
