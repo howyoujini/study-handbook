@@ -635,15 +635,13 @@ socialLogin("Google"); // 구글 로그인 성공
 
 
 
-## 추상 팩토리 패턴과 팩토리 메서드 패턴은 어떻게 다를까? <a href="#abstract-factory" id="abstract-factory"></a>
+## 팩토리 메서드 패턴과 추상 팩토리 패턴은 어떻게 다를까? <a href="#factory-method-abstract-factory" id="factory-method-abstract-factory"></a>
 
 팩토리 메소드 패턴은 종종 **추상 팩토리 패턴(Abstract Factory Pattern)**&#xACFC; 함께 사용됩니다.
 
 <details>
 
 <summary>🏭 OS별 버튼 생성 - 팩토리 메서드 패턴</summary>
-
-
 
 ```typescript
 // 인터페이스 정의
@@ -696,7 +694,7 @@ factory.render(); // "Windows 스타일 버튼 렌더링"
 
 <details>
 
-<summary>🏢 OS별 UI 컴포넌트(Button &#x26; Checkbox) 생성</summary>
+<summary>🏢 OS별 UI 컴포넌트(Button &#x26; Checkbox) 생성 - 추상 팩토리 패턴</summary>
 
 하나의 팩토리에서 서로 연관된 객체 여러 개를 생성할 수 있습니다. UI 요소 같은 제품군(Product Family) 관리 가능합니다. 새로운 UI 시스템이 추가될 경우, 새로운 UIFactory를 만들 수 있습니다. (확장성 우수)
 
@@ -782,21 +780,19 @@ createUI(factory);
 
 </details>
 
-
-
 팩토리 메소드를 추상 클래스로 정의하여 **각 팩토리마다 독립적인 생성 방식 유지**할 수 있습니다. 클라이언트 코드가 특정 팩토리 인스턴스를 선택하여 사용할 수 있도록 유도합니다.&#x20;
 
 <table><thead><tr><th width="130">구분</th><th>팩토리 메서드 (Factory Method)</th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>패턴 유형</td><td>생성 패턴</td><td>생성 패턴</td></tr><tr><td>목적</td><td>하나의 객체를 생성하는 팩토리 메서드를 제공</td><td>관련된 <strong>여러 객체군(Family)</strong>을 생성하는 팩토리를 제공</td></tr><tr><td>구성</td><td>단일 객체 생성을 위한 하위 클래스에서 팩토리 메서드를 구현</td><td>여러 객체를 생성하는 팩토리 클래스 자체를 추상화</td></tr><tr><td>확장성</td><td>새로운 객체 유형을 추가하려면 기존 팩토리 메서드를 수정해야 함</td><td>새로운 객체군을 추가할 때 기존 팩토리를 수정할 필요 없음</td></tr><tr><td>유지보수</td><td>상대적으로 단순한 구조</td><td>보다 복잡한 구조지만 유지보수성이 높음</td></tr><tr><td>사용 사례</td><td>특정 인터페이스를 가진 객체를 동적으로 생성해야 할 때</td><td>특정 제품군(예: UI 컴포넌트, 데이터베이스 등)을 <strong>그룹화</strong>하여 생성할 때</td></tr><tr><td>예제</td><td>ButtonFactory → Button (WindowsButton, MacOSButton)</td><td>UIFactory → Button, Checkbox (WindowsUIFactory, MacOSUIFactory)</td></tr></tbody></table>
 
 
 
-## 팩토리 메서드 패턴의 장점 <a href="#benefits" id="benefits"></a>
+## 팩토리 메서드 패턴의 장점 <a href="#advantages" id="advantages"></a>
 
 1. **객체 생성 로직을 분리하여 코드 가독성 향상**
 2. **클라이언트 코드의 결합도 낮추기 (Loose Coupling)**
 3. **새로운 객체 타입을 쉽게 추가하여 확장성 증가**
 
-## 팩토리 메서드 패턴의 단점
+## 팩토리 메서드 패턴의 단점 <a href="#disadvantages" id="disadvantages"></a>
 
 * 각 제품 구현체마다 팩토리 객체들을 모두 구현해주어야 하기 때문에, 구현체가 늘어날때 마다 팩토리 클래스가 증가하여 서브 클래스 수가 폭발합니다.
 * 코드가 매우 복잡해질 수 있습니다.
@@ -804,7 +800,7 @@ createUI(factory);
 
 
 
-## 정리
+## 정리 <a href="#summary" id="summary"></a>
 
 <table><thead><tr><th width="102">구분</th><th>팩토리 (Factory)</th><th>팩토리 메소드 (Factory Method) </th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>핵심 개념</td><td>객체 생성을 위한 단순한 팩토리 함수 또는 클래스</td><td>객체 생성을 위한 하위클래스에서 구현해야 하는 메서드 제공 </td><td>서로 연관된 객체 그룹을 생성하는 팩토리 제공</td></tr><tr><td>구성 요소</td><td><ul><li>팩토리 클래스 또는 함수</li><li>제품 객체</li></ul></td><td><ul><li>팩토리 클래스를 부모로 두고, 하위 클래스에서 구현 </li><li>서브클래스에서 <code>create(</code>)를 구현</li></ul></td><td><ul><li>여러 개의 팩토리 메서드를 포함한 팩토리 클래스</li><li>여러 개의 제품이 생성됨</li></ul></td></tr><tr><td>사용 목적</td><td>단순한 객체 생성 방식 제공</td><td>객체 생성을 하위클래스에서 결정하도록 강제</td><td>객체 계열(Family)을 함께 생성</td></tr><tr><td>확장성</td><td>새로운 제품을 추가할 때 팩토리 로직 수정 필요</td><td>새로운 제품을 추가할 때 새로운 하위 클래스 추가</td><td>새로운 제품군을 추가할 때 새로운 팩토리 추가</td></tr><tr><td>예제</td><td><code>ButtonFactory.createButton("Windows")</code></td><td><code>WindowsButtonFactory.createButton()</code></td><td><code>WindowsUIFactory.createButton()</code>, <code>WindowsUIFactory.createCheckbox()</code></td></tr></tbody></table>
 
@@ -812,6 +808,6 @@ createUI(factory);
 
 팩토리 메소드 패턴은 객체 생성 로직을 캡슐화하고, 유연한 확장을 가능하게 합니다. 다양한 프레임워크와 라이브러리에서 널리 사용되므로, 실제 프로젝트에서 적절히 활용하면 보다 유지보수성이 높은 코드를 작성할 수 있습니다. 여러분은 어떤 사례에서 팩토리 메소드 패턴을 활용해 보셨나요? 😊
 
-#### **참고 자료**
+#### **참고 자료** <a href="#reference" id="reference"></a>
 
 {% embed url="https://refactoring.guru/ko/design-patterns/factory-method" %}
