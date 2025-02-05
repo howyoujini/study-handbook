@@ -23,25 +23,50 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 #### ❌ 팩토리 패턴이 없을 경우 (변경 범위가 넓음)
 
 ```typescript
-interface UserDto {
+// 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
+class UserDto {
   id: number;
   name: string;
   email: string;
   age?: number;
+
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
+
+  validate(): boolean {
+    if (!this.name || !this.email) {
+      throw new Error("이름과 이메일은 필수 입력 값입니다.");
+    }
+    return true;
+  }
 }
 
+// 2. User 클래스 (도메인 객체)
 class User {
   constructor(private dto: UserDto) {}
 
   getProfile(): string {
-    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}`;
+    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}, 나이: ${this.dto.age ?? "미입력"}`;
   }
 }
 
-// ❌ 클라이언트 코드에서 직접 User 객체를 생성
-const userDto: UserDto = { id: 1, name: "Ella", email: "ella@example.com" };
-const user = new User(userDto); // ⚠️ 객체 생성 방식이 변경되면 클라이언트 코드 수정 필요
-console.log(user.getProfile());
+// 3. UserFactory (팩토리 클래스)
+class UserFactory {
+  static createUser(dto: UserDto): User {
+    dto.validate(); // ✅ UserDto의 유효성 검사 실행
+    return new User(dto);
+  }
+}
+
+// 4. 사용 예시
+const userDto = new UserDto(1, "Ella", "ella@example.com", 25);
+const user = UserFactory.createUser(userDto);
+
+console.log(user.getProfile()); // "이름: Ella, 이메일: ella@example.com, 나이: 25"
 ```
 
 #### ✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)
