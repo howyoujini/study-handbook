@@ -47,7 +47,17 @@ class UserDto {
 
 // 2. User 클래스 (도메인 객체)
 class User {
-  constructor(private dto: UserDto) {}
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+  
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
 
   getProfile(): string {
     return `이름: ${this.dto.name}, 이메일: ${this.dto.email}, 나이: ${this.dto.age ?? "미입력"}`;
