@@ -67,20 +67,14 @@ class User {
 class UserService {
   signIn(dto: UserDto): User {
     console.log("UserService를 통해 User 로그인");
-    return new User(dto);
+    return new User(1, "Ella", "ella@example.com", 25);
   }
   
   signUp(dto: UserDto): User {
     console.log("UserService를 통해 User 회원가입");
-    return new User(dto);
+    return new User(1, "Ella", "ella@example.com", 25);
   }
 }
-
-// 3. 사용 예시
-const userDto = new UserDto(1, "Ella", "ella@example.com", 25);
-const user = UserFactory.createUser(userDto);
-
-console.log(user.getProfile()); // "이름: Ella, 이메일: ella@example.com, 나이: 25"
 ```
 
 #### ✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)
