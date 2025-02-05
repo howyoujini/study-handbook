@@ -6,7 +6,7 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 <figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/factory-method">https://refactoring.guru/ko/design-patterns/factory-method</a></p></figcaption></figure>
 
-팩토리 메소드 패턴(Factory Method Pattern)은 객체 **생성을 캡슐화하여, 하위클래스에서** 객체의 **생성 방식을 결정하도록 하는 디자인 패턴**입니다. 즉, 객체를 직접 생성하는 것이 아니라, **객체 생성을 담당하는 메소드를 통해 객체를 반환**하도록 합니다. 이 패턴을 활용하면 클라이언트 코드가 특정 클래스의 인스턴스를 직접 생성하지 않고, 추상화된 인터페이스를 통해 객체를 생성할 수 있습니다.
+팩토리 메소드 패턴(Factory Method Pattern)은 객체 **생성을 캡슐화**하여, 하위클래스에서 객체의 **생성 방식을 결정하도록 하는 디자인 패턴**입니다. 즉, 객체를 직접 생성하는 것이 아니라, **객체 생성을 담당하는 메소드를 통해 객체를 반환**하도록 합니다. 이 패턴을 활용하면 클라이언트 코드가 특정 클래스의 인스턴스를 직접 생성하지 않고, 추상화된 인터페이스를 통해 객체를 생성할 수 있습니다.
 
 
 
@@ -16,12 +16,15 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 ### 팩토리 패턴 (Factory Pattern)
 
-객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **객체 생성 방식이 고정**되어 있고, 여러 하위클래스를 관리할 때 유용합니다.&#x20;
+객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **단순한 객체 생성을 중앙 집중화할 때** 유용합니다.&#x20;
+
+`User`라는 엔티티와 DTO를 만들어보겠습니다.&#x20;
 
 <details>
 
 <summary>❌ 팩토리 패턴이 없을 경우 (변경 범위가 넓음)</summary>
 
+{% code lineNumbers="true" %}
 ```typescript
 // 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
 class UserDto {
@@ -45,7 +48,7 @@ class UserDto {
   }
 }
 
-// 2. User 클래스 (도메인 객체)
+// 2. User 클래스 (엔티티)
 class User {
   id: number;
   name: string;
@@ -68,15 +71,19 @@ class User {
 class UserService {
   signIn(dto: UserDto): User {
     console.log("UserService를 통해 User 로그인");
-    return new User(1, "Ella", "ella@example.com", 25);
+    return new User(dto.id, dto.name, dto.email, dto.age);
   }
   
   signUp(dto: UserDto): User {
     console.log("UserService를 통해 User 회원가입");
-    return new User(1, "Ella", "ella@example.com", 25);
+    return new User(dto.id, dto.name, dto.email, dto.age);
   }
 }
+
 ```
+{% endcode %}
+
+만약 `UserDto`에 `gender` 프로퍼티가 추가된다면, `UserDto`, `User`, 그리고 `UserService`의 `signIn`, `signUp` 메서드를 포함하여 `UserDto`에 의존하는 모든 코드에서 수정이 필요하게 됩니다.
 
 </details>
 
@@ -84,6 +91,7 @@ class UserService {
 
 <summary>✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)</summary>
 
+{% code lineNumbers="true" %}
 ```typescript
 // 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
 class UserDto {
@@ -126,7 +134,7 @@ class User {
   }
 }
 
-// 3. UserFactory (팩토리 클래스 - User 객체 생성 책임)
+// 3. UserFactory (팩토리 클래스 - User 객체 생성 책임) - 캡슐화
 class UserFactory {
   static createUser(dto: UserDto): User {
     dto.validate(); // ✅ 데이터 검증 실행
@@ -147,17 +155,18 @@ class UserService {
   }
 }
 
-// 5. 사용 예시
-const userService = new UserService();
-
-const userDto = new UserDto(1, "Ella", "ella@example.com", 25);
-const newUser = userService.signUp(userDto);
-console.log(newUser.getProfile());
-
-const signedInUser = userService.signIn(userDto);
-console.log(signedInUser.getProfile());
 ```
+{% endcode %}
 
+만약 `UserDto`에 `gender`라는 프로퍼티가 추가된다면, 팩토리를 활용하여 `UserService` 코드 수정 없이도 객체 생성 로직을 변경할 수 있습니다.
+
+</details>
+
+<details>
+
+<summary>🔄 생성 방식이 바뀐 후 (팩토리 패턴 적용)</summary>
+
+{% code lineNumbers="true" %}
 ```typescript
 // 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
 class UserDto {
@@ -165,12 +174,14 @@ class UserDto {
   name: string;
   email: string;
   age?: number;
+  gender: string;
 
-  constructor(id: number, name: string, email: string, age?: number) {
+  constructor(id: number, name: string, email: string, age?: number, gender: string) {
     this.id = id;
     this.name = name;
     this.email = email;
     this.age = age ?? 0; // 기본값 설정
+    this.gender = gender;
   }
 
   validate(): boolean {
@@ -187,69 +198,46 @@ class User {
   name: string;
   email: string;
   age?: number;
+  gender: string;
   
-  constructor(id: number, name: string, email: string, age?: number) {
+  constructor(id: number, name: string, email: string, age?: number, gender: string) {
     this.id = id;
     this.name = name;
     this.email = email;
     this.age = age ?? 0; // 기본값 설정
+    this.gender = gender;
   }
 
   getProfile(): string {
-    return `이름: ${this.name}, 이메일: ${this.email}, 나이: ${this.age ?? "미입력"}`;
+    return `이름: ${this.name}, 이메일: ${this.email}, 나이: ${this.age ?? "미입력"}, 성별: ${this.gender}`;
   }
 }
 
-// 2. User Service 클래스 (서비스 객체)
+// 3. UserFactory (팩토리 클래스 - User 객체 생성 책임) - 캡슐화
+class UserFactory {
+  static createUser(dto: UserDto): User {
+    dto.validate(); // ✅ 데이터 검증 실행
+    return new User(dto.id, dto.name, dto.email, dto.age, dto.gender);
+  }
+}
+
+// 4. UserService (User 관련 비즈니스 로직 관리)
 class UserService {
   signIn(dto: UserDto): User {
-    console.log("UserService를 통해 User 로그인");
-    return new User(1, "Ella", "ella@example.com", 25);
+    console.log("✅ UserService: 로그인 요청 처리");
+    return UserFactory.createUser(dto); // 🔥 팩토리 사용하여 객체 생성
   }
   
   signUp(dto: UserDto): User {
-    console.log("UserService를 통해 User 회원가입");
-    return new User(1, "Ella", "ella@example.com", 25);
+    console.log("✅ UserService: 회원가입 요청 처리");
+    return UserFactory.createUser(dto); // 🔥 팩토리 사용하여 객체 생성
   }
 }
 
-class UserFactory {
-
-}
-
-// 3. 클라이언트 코드 (변경 범위 최소화)
-const userDto: UserDto = { id: 1, name: "Ella", email: "ella@example.com" };
-const user = UserFactory.createUser(userDto); // ✅ 클라이언트 코드는 수정할 필요 없음
-console.log(user.getProfile());
 ```
+{% endcode %}
 
-</details>
-
-<details>
-
-<summary>🔄 생성 방식이 바뀐 후 (팩토리 패턴 적용)</summary>
-
-```typescript
-// 1. UserService 추가 (새로운 생성 방식)
-class UserService {
-  static createUser(dto: UserDto): User {
-    console.log("UserService를 통해 User 생성");
-    return new User(dto);
-  }
-}
-
-// 2. UserFactory 수정 (팩토리 내부에서만 수정됨)
-class UserFactory {
-  static createUser(dto: UserDto): User {
-    return UserService.createUser(dto); // ✅ 변경 범위 최소화
-  }
-}
-
-// 3. 클라이언트 코드 (변경 필요 없음)
-const userDto: UserDto = { id: 1, name: "Alice", email: "alice@example.com" };
-const user = UserFactory.createUser(userDto);
-console.log(user.getProfile()); // "UserService를 통해 User 생성"
-```
+`User` 엔티티에 `gender` 속성을 추가해보면 UserService 코드엔 영향을 끼치지 않게 됩니다.
 
 </details>
 
