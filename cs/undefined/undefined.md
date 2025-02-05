@@ -312,7 +312,7 @@ console.log(config1 === config2); // true (같은 인스턴스)
 
 객체를 애플리케이션 시작 시 생성(Eager)할지, 실제 사용 시점까지 미룰지(Lazy) 선택하는 것도 중요한 성능 최적화 요소입니다. 메모리 사용이 크지 않고 반드시 필요한 객체라면 Eager 방식이 더 나을 수도 있습니다.
 
-### 2. 객체 생성 비용 감소
+### 2. 객체 생성 비용 감소 <a href="#reduced-object-cost" id="reduced-object-cost"></a>
 
 객체 생성 비용(Initialization Cost) 을 줄여 성능을 향상시킬 수 있습니다. 예를 들어, **DB Connection Pooling**과 같은 기능에서는 매번 새로운 DB 연결을 생성하면 커넥션 설정 비용(Handshake, Authentication 등) 이 발생하여 성능 저하를 유발합니다. 싱글톤을 활용하여 하나의 연결 객체를 유지하면, 불필요한 연결 생성 비용을 절감할 수 있습니다. **JDBC**(Java Database Connectivity) Connection Pooling(HikariCP, DBCP)에서도 동일한 개념이 적용됩니다.
 
