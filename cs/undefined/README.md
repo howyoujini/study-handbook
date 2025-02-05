@@ -110,7 +110,7 @@ description: 소프트웨어를 설계하는 과정에서 자주 발생하는 �
 * 객체를 효율적으로 생성하고 관리하는 방법을 제공합니다.
 * 객체 생성 과정에서 중복을 줄이고, 유연성을 높입니다.
 
-<table><thead><tr><th width="270">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td><a href="undefined.md">Singleton (싱글톤)</a></td><td>하나의 클래스에 오직 하나의 인스턴스만 가지는 패턴</td></tr><tr><td><a href="../design-pattern/factory-method.md">Factory Method (팩토리 메서드)</a></td><td>객체 생성 주체를 서브클래스로 위임하는 패턴</td></tr><tr><td>Abstract Factory (추상 팩토리)</td><td>관련된 객체들을 생성할 수 있도록 하는 팩토리들의 집합</td></tr><tr><td>Builder (빌더)</td><td>복잡한 객체 생성을 단계적으로 진행할 수 있도록 하는 패턴</td></tr><tr><td>Prototype (프로토타입)</td><td>기존 객체를 복사하여 새로운 객체를 생성하는 패턴</td></tr></tbody></table>
+<table><thead><tr><th width="270">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td><a href="undefined.md">Singleton (싱글톤)</a></td><td>하나의 클래스에 오직 하나의 인스턴스만 가지는 패턴</td></tr><tr><td><a href="../design-pattern/factory-method.md">Factory Method (팩토리 메서드)</a></td><td>객체 생성 주체를 하위클래스로 위임하는 패턴</td></tr><tr><td>Abstract Factory (추상 팩토리)</td><td>관련된 객체들을 생성할 수 있도록 하는 팩토리들의 집합</td></tr><tr><td>Builder (빌더)</td><td>복잡한 객체 생성을 단계적으로 진행할 수 있도록 하는 패턴</td></tr><tr><td>Prototype (프로토타입)</td><td>기존 객체를 복사하여 새로운 객체를 생성하는 패턴</td></tr></tbody></table>
 
 
 {% endstep %}
