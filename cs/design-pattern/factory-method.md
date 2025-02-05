@@ -14,13 +14,13 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 둘 다 객체 생성을 캡슐화하는 디자인 패턴이지만, 그 방식과 의도에서 차이가 있습니다.
 
+### 팩토리 패턴 (Factory Pattern)
+
+객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **객체 생성 방식이 고정**되어 있고, 여러 하위클래스를 관리할 때 유용합니다.&#x20;
+
 <details>
 
-<summary>팩토리 패턴 (Factory Pattern)</summary>
-
-객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **객체 생성 방식이 고정**되어 있고, 여러 서브클래스를 관리할 때 유용합니다.&#x20;
-
-#### ❌ 팩토리 패턴이 없을 경우 (변경 범위가 넓음)
+<summary>❌ 팩토리 패턴이 없을 경우 (변경 범위가 넓음)</summary>
 
 ```typescript
 // 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
@@ -64,6 +64,7 @@ class User {
   }
 }
 
+// 3. UserService (User 관련 비즈니스 로직 관리)
 class UserService {
   signIn(dto: UserDto): User {
     console.log("UserService를 통해 User 로그인");
@@ -77,24 +78,143 @@ class UserService {
 }
 ```
 
-#### ✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)
+</details>
+
+<details>
+
+<summary>✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)</summary>
 
 ```typescript
-// 1. User 클래스 (User 생성 방식이 변경될 가능성이 있음)
-class User {
-  constructor(private dto: UserDto) {}
+// 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
+class UserDto {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
 
-  getProfile(): string {
-    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}`;
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
+
+  validate(): boolean {
+    if (!this.name || !this.email) {
+      throw new Error("이름과 이메일은 필수 입력 값입니다.");
+    }
+    return true;
   }
 }
 
-// 2. UserFactory (팩토리 클래스)
+// 2. User 클래스 (도메인 객체)
+class User {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+  
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
+
+  getProfile(): string {
+    return `이름: ${this.name}, 이메일: ${this.email}, 나이: ${this.age ?? "미입력"}`;
+  }
+}
+
+// 3. UserFactory (팩토리 클래스 - User 객체 생성 책임)
 class UserFactory {
   static createUser(dto: UserDto): User {
-    // 👇 객체 생성 방식이 변경되어도 클라이언트 코드 수정 불필요
-    return new User(dto);
+    dto.validate(); // ✅ 데이터 검증 실행
+    return new User(dto.id, dto.name, dto.email, dto.age);
   }
+}
+
+// 4. UserService (User 관련 비즈니스 로직 관리)
+class UserService {
+  signIn(dto: UserDto): User {
+    console.log("✅ UserService: 로그인 요청 처리");
+    return UserFactory.createUser(dto); // 🔥 팩토리 사용하여 객체 생성
+  }
+  
+  signUp(dto: UserDto): User {
+    console.log("✅ UserService: 회원가입 요청 처리");
+    return UserFactory.createUser(dto); // 🔥 팩토리 사용하여 객체 생성
+  }
+}
+
+// 5. 사용 예시
+const userService = new UserService();
+
+const userDto = new UserDto(1, "Ella", "ella@example.com", 25);
+const newUser = userService.signUp(userDto);
+console.log(newUser.getProfile());
+
+const signedInUser = userService.signIn(userDto);
+console.log(signedInUser.getProfile());
+```
+
+```typescript
+// 1. UserDto 클래스 (데이터 구조를 정의하는 DTO)
+class UserDto {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
+
+  validate(): boolean {
+    if (!this.name || !this.email) {
+      throw new Error("이름과 이메일은 필수 입력 값입니다.");
+    }
+    return true;
+  }
+}
+
+// 2. User 클래스 (도메인 객체)
+class User {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+  
+  constructor(id: number, name: string, email: string, age?: number) {
+    this.id = id;
+    this.name = name;
+    this.email = email;
+    this.age = age ?? 0; // 기본값 설정
+  }
+
+  getProfile(): string {
+    return `이름: ${this.name}, 이메일: ${this.email}, 나이: ${this.age ?? "미입력"}`;
+  }
+}
+
+// 2. User Service 클래스 (서비스 객체)
+class UserService {
+  signIn(dto: UserDto): User {
+    console.log("UserService를 통해 User 로그인");
+    return new User(1, "Ella", "ella@example.com", 25);
+  }
+  
+  signUp(dto: UserDto): User {
+    console.log("UserService를 통해 User 회원가입");
+    return new User(1, "Ella", "ella@example.com", 25);
+  }
+}
+
+class UserFactory {
+
 }
 
 // 3. 클라이언트 코드 (변경 범위 최소화)
@@ -103,7 +223,11 @@ const user = UserFactory.createUser(userDto); // ✅ 클라이언트 코드는 �
 console.log(user.getProfile());
 ```
 
-#### 🔄 생성 방식이 바뀐 후 (팩토리 패턴 적용)
+</details>
+
+<details>
+
+<summary>🔄 생성 방식이 바뀐 후 (팩토리 패턴 적용)</summary>
 
 ```typescript
 // 1. UserService 추가 (새로운 생성 방식)
@@ -126,6 +250,10 @@ const userDto: UserDto = { id: 1, name: "Alice", email: "alice@example.com" };
 const user = UserFactory.createUser(userDto);
 console.log(user.getProfile()); // "UserService를 통해 User 생성"
 ```
+
+</details>
+
+
 
 User 객체 이외에, 소셜 로그인 인터페이스를 통해 **다양한 제 3자 로그인**을 구현해보겠습니다.
 
@@ -189,7 +317,7 @@ googleLogin.login(); // 구글 로그인 실행
 ```
 {% endcode %}
 
-</details>
+
 
 <details>
 
