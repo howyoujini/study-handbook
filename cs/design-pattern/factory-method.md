@@ -400,7 +400,7 @@ googleLogin.login(); // "구글 로그인 실행"
 
 </details>
 
-<table><thead><tr><th width="144">구분</th><th width="306">팩토리 패턴 (Factory Pattern)</th><th>팩토리 메서드 패턴 (Factory Method Pattern)</th></tr></thead><tbody><tr><td>객체 생성 책임</td><td>하나의 팩토리 클래스가 생성 책임을 가짐</td><td>하위클래스에서 객체 생성 로직을 결정</td></tr><tr><td>유연성</td><td>새로운 객체 유형 추가 시 기존 팩토리 클래스 수정 필요</td><td>새로운 하위클래스를 추가하여 확장 가능 (OCP 준수)</td></tr><tr><td>설계 방식 </td><td>단순한 정적 메서드 또는 별도의 팩토리 클래스를 사용</td><td>상속을 활용해 객체 생성 방식을 변경</td></tr><tr><td>사용 예</td><td>단순한 객체 생성을 중앙 집중화할 때</td><td>다양한 객체 생성을 하위클래스에 위임할 때</td></tr></tbody></table>
+<table><thead><tr><th width="136">구분</th><th width="306">팩토리 (Factory)</th><th>팩토리 메서드 (Factory Method)</th></tr></thead><tbody><tr><td>객체 생성 책임</td><td>하나의 팩토리 클래스가 생성 책임을 가짐</td><td>하위클래스에서 객체 생성 로직을 결정</td></tr><tr><td>유연성</td><td>새로운 객체 유형 추가 시 기존 팩토리 클래스 수정 필요</td><td>새로운 하위클래스를 추가하여 확장 가능 (OCP 준수)</td></tr><tr><td>설계 방식 </td><td>단순한 정적 메서드 또는 별도의 팩토리 클래스를 사용</td><td>상속을 활용해 객체 생성 방식을 변경</td></tr><tr><td>사용 예</td><td>단순한 객체 생성을 중앙 집중화할 때</td><td>다양한 객체 생성을 하위클래스에 위임할 때</td></tr></tbody></table>
 
 
 
@@ -409,6 +409,8 @@ googleLogin.login(); // "구글 로그인 실행"
 1. **객체 생성 로직을 캡슐화** → 객체 생성을 직접 하지 않고, **팩토리 메소드를 통해** 생성
 2. **유연한 확장성** → 새로운 객체 타입이 추가되더라도 **기존 코드 수정 없이** 확장 가능
 3. **결합도 낮추기** → 클라이언트 코드가 구체적인 클래스를 몰라도 객체를 생성할 수 있도록 유도
+
+
 
 ## 언제 활용할 수 있을까? <a href="#use-cases" id="use-cases"></a>
 
@@ -420,65 +422,61 @@ googleLogin.login(); // "구글 로그인 실행"
 
 OS마다 UI 컴포넌트가 다르기 때문에 Button을 직접 생성하면 OS별 분기 처리가 필요합니다. 이 경우 팩토리 메소드 패턴을 활용하면 OS별 버튼을 쉽게 추가할 수 있습니다. 자바스크립트의 `class`를 활용하여 버튼 인터페이스를 만들어보겠습니다.&#x20;
 
-```javascript
+```typescript
 // 1. 버튼 인터페이스 정의
-class Button {
-  render() {
-    throw new Error("render() 메소드를 구현해야 합니다.");
-  }
+abstract class Button {
+  abstract render(): void;
 }
 
 // 2. 각 OS에 맞는 버튼 클래스 구현
 class WindowsButton extends Button {
-  render() {
+  render(): void {
     console.log("Windows 스타일의 버튼 렌더링");
   }
 }
 
 class MacOSButton extends Button {
-  render() {
+  render(): void {
     console.log("MacOS 스타일의 버튼 렌더링");
   }
 }
 
-// 3. 팩토리 메소드가 있는 창 클래스
-class Dialog {
-  createButton() {
-    throw new Error("createButton() 메소드를 구현해야 합니다.");
-  }
+// 3. 팩토리 메소드가 있는 렌더러 클래스
+abstract class Renderer {
+  abstract createButton(): Button;
 
-  render() {
+  render(): void {
     const button = this.createButton();
     button.render();
   }
 }
 
 // 4. OS에 맞는 팩토리 구현
-class WindowsDialog extends Dialog {
-  createButton() {
+class WindowsRenderer extends Renderer {
+  createButton(): Button {
     return new WindowsButton();
   }
 }
 
-class MacOSDialog extends Dialog {
-  createButton() {
+class MacOSRenderer extends Renderer {
+  createButton(): Button {
     return new MacOSButton();
   }
 }
 
 // 5. 클라이언트 코드
-function application(OS) {
-  let dialog;
+function application(OS: string): void {
+  let renderer: Renderer;
 
   if (OS === "Windows") {
-    dialog = new WindowsDialog();
+    renderer = new WindowsRenderer();
   } else if (OS === "MacOS") {
-    dialog = new MacOSDialog();
+    renderer = new MacOSRenderer();
   } else {
     throw new Error("지원되지 않는 OS");
   }
 
-  dialog.render();
+  renderer.render();
 }
 
 // 사용 예시
@@ -496,49 +494,45 @@ OS에 따라 적절한 버튼을 생성하여 렌더링할 수 있게 되었습�
 
 어떤 애플리케이션이 다양한 데이터베이스를 지원해야 할 때, 팩토리 메소드 패턴을 사용하면 코드의 변경 없이 쉽게 확장할 수 있습니다.&#x20;
 
-```javascript
+```typescript
 // 1. 데이터베이스 인터페이스 정의
-class Database {
-  connect() {
-    throw new Error("connect() 메소드를 구현해야 합니다.");
-  }
+abstract class Database {
+  abstract connect(): void;
 }
 
 // 2. 특정 데이터베이스 연결 클래스 구현
 class MySQLDatabase extends Database {
-  connect() {
+  connect(): void {
     console.log("MySQL 데이터베이스에 연결됨");
   }
 }
 
 class PostgreSQLDatabase extends Database {
-  connect() {
+  connect(): void {
     console.log("PostgreSQL 데이터베이스에 연결됨");
   }
 }
 
 // 3. 팩토리 메소드 패턴 적용
-class DatabaseFactory {
-  createDatabase() {
-    throw new Error("createDatabase() 메소드를 구현해야 합니다.");
-  }
+abstract class DatabaseFactory {
+  abstract createDatabase(): Database;
 }
 
 class MySQLDatabaseFactory extends DatabaseFactory {
-  createDatabase() {
+  createDatabase(): Database {
     return new MySQLDatabase();
   }
 }
 
 class PostgreSQLDatabaseFactory extends DatabaseFactory {
-  createDatabase() {
+  createDatabase(): Database {
     return new PostgreSQLDatabase();
   }
 }
 
 // 4. 클라이언트 코드
-function getDatabaseConnection(type) {
-  let factory;
+function getDatabaseConnection(type: string): void {
+  let factory: DatabaseFactory;
 
   if (type === "MySQL") {
     factory = new MySQLDatabaseFactory();
@@ -565,109 +559,254 @@ getDatabaseConnection("PostgreSQL"); // PostgreSQL 데이터베이스에 연결�
 
 <summary>다양한 소셜로그인(Kakao, Naver 등)을 지원해야하는 경우</summary>
 
+```typescript
+// 1. 소셜 로그인 인터페이스 정의
+abstract class SocialLogin {
+  abstract authenticate(): void;
+}
 
+// 2. 각 소셜 로그인 클래스 구현
+class KakaoLogin extends SocialLogin {
+  authenticate(): void {
+    console.log("카카오 로그인 성공");
+  }
+}
+
+class NaverLogin extends SocialLogin {
+  authenticate(): void {
+    console.log("네이버 로그인 성공");
+  }
+}
+
+class GoogleLogin extends SocialLogin {
+  authenticate(): void {
+    console.log("구글 로그인 성공");
+  }
+}
+
+// 3. 팩토리 메소드 패턴 적용
+abstract class SocialLoginFactory {
+  abstract createLogin(): SocialLogin;
+}
+
+class KakaoLoginFactory extends SocialLoginFactory {
+  createLogin(): SocialLogin {
+    return new KakaoLogin();
+  }
+}
+
+class NaverLoginFactory extends SocialLoginFactory {
+  createLogin(): SocialLogin {
+    return new NaverLogin();
+  }
+}
+
+class GoogleLoginFactory extends SocialLoginFactory {
+  createLogin(): SocialLogin {
+    return new GoogleLogin();
+  }
+}
+
+// 4. 클라이언트 코드
+function socialLogin(type: string): void {
+  let factory: SocialLoginFactory;
+
+  if (type === "Kakao") {
+    factory = new KakaoLoginFactory();
+  } else if (type === "Naver") {
+    factory = new NaverLoginFactory();
+  } else if (type === "Google") {
+    factory = new GoogleLoginFactory();
+  } else {
+    throw new Error("지원되지 않는 소셜 로그인 타입");
+  }
+
+  const login = factory.createLogin();
+  login.authenticate();
+}
+
+// 사용 예시
+socialLogin("Kakao"); // 카카오 로그인 성공
+socialLogin("Naver"); // 네이버 로그인 성공
+socialLogin("Google"); // 구글 로그인 성공
+```
 
 </details>
 
 
 
-## 구현 방법 <a href="#implementation" id="implementation"></a>
-
-```javascript
-class Product {
-  use() {
-    throw new Error("use() 메서드는 서브클래스에서 구현해야 합니다.");
-  }
-}
-
-class ConcreteProductA extends Product {
-  use() {
-    console.log("상품 A 사용 중...");
-  }
-}
-
-class ConcreteProductB extends Product {
-  use() {
-    console.log("상품 B 사용 중...");
-  }
-}
-
-class ProductFactory {
-  static createProduct(type) {
-    if (type === "A") return new ConcreteProductA();
-    if (type === "B") return new ConcreteProductB();
-    throw new Error("잘못된 상품 타입입니다.");
-  }
-}
-
-const productA = ProductFactory.createProduct("A");
-const productB = ProductFactory.createProduct("B");
-
-productA.use(); // "상품 A 사용 중..."
-productB.use(); // "상품 B 사용 중..."
-```
-
-`ConcreteProductA`, `ConcreteProductB`를 통해 제품 클래스를 확장하여 **`switch` 문을 제거**했습니다. 새로운 제품을 추가할 때, `ProductFactory`의 **내부 로직을 수정하지 않고 새로운 클래스를 추가**하면 됩니다. (확장성 증가, OCP 원칙 준수)
-
-### 3. 추상 팩토리 패턴과의 결합 <a href="#abstract-factory" id="abstract-factory"></a>
+## 추상 팩토리 패턴과 팩토리 메서드 패턴은 어떻게 다를까? <a href="#abstract-factory" id="abstract-factory"></a>
 
 팩토리 메소드 패턴은 종종 **추상 팩토리 패턴(Abstract Factory Pattern)**&#xACFC; 함께 사용됩니다.
 
-```javascript
-class Product {
-  constructor(name) {
-    this.name = name;
-  }
+<details>
 
-  use() {
-    console.log(`${this.name} 제품을 사용합니다.`);
+<summary>🏭 OS별 버튼 생성 - 팩토리 메서드 패턴</summary>
+
+
+
+```typescript
+// 인터페이스 정의
+abstract class Button {
+  abstract render(): void;
+}
+
+// 구체적인 클래스
+class WindowsButton extends Button {
+  render(): void {
+    console.log("Windows 스타일 버튼 렌더링");
   }
 }
 
-class AbstractFactory {
-  createProduct() {
-    throw new Error("createProduct() 메서드는 서브클래스에서 구현해야 합니다.");
+class MacOSButton extends Button {
+  render(): void {
+    console.log("MacOS 스타일 버튼 렌더링");
   }
 }
 
-class ProductFactoryA extends AbstractFactory {
-  createProduct() {
-    return new Product("상품 A");
+// 팩토리 메서드가 있는 클래스 (Renderer)
+abstract class ButtonFactory {
+  abstract createButton(): Button;
+
+  render(): void {
+    const button = this.createButton();
+    button.render();
   }
 }
 
-class ProductFactoryB extends AbstractFactory {
-  createProduct() {
-    return new Product("상품 B");
+// 팩토리 클래스 (각 OS별 버튼 생성)
+class WindowsButtonFactory extends ButtonFactory {
+  createButton(): Button {
+    return new WindowsButton();
   }
 }
 
-const factoryA = new ProductFactoryA();
-const factoryB = new ProductFactoryB();
+class MacOSButtonFactory extends ButtonFactory {
+  createButton(): Button {
+    return new MacOSButton();
+  }
+}
 
-const productA = factoryA.createProduct();
-const productB = factoryB.createProduct();
-
-productA.use(); // "상품 A 제품을 사용합니다."
-productB.use(); // "상품 B 제품을 사용합니다."
+// 사용 예시
+const factory: ButtonFactory = new WindowsButtonFactory();
+factory.render(); // "Windows 스타일 버튼 렌더링"
 ```
+
+</details>
+
+<details>
+
+<summary>🏢 OS별 UI 컴포넌트(Button &#x26; Checkbox) 생성</summary>
+
+하나의 팩토리에서 서로 연관된 객체 여러 개를 생성할 수 있습니다. UI 요소 같은 제품군(Product Family) 관리 가능합니다. 새로운 UI 시스템이 추가될 경우, 새로운 UIFactory를 만들 수 있습니다. (확장성 우수)
+
+```typescript
+// 1. 공통 인터페이스 정의
+abstract class Button {
+  abstract render(): void;
+}
+
+abstract class Checkbox {
+  abstract render(): void;
+}
+
+// 2. 구체적인 제품 클래스 (Windows UI)
+class WindowsButton extends Button {
+  render(): void {
+    console.log("Windows 스타일 버튼 렌더링");
+  }
+}
+
+class WindowsCheckbox extends Checkbox {
+  render(): void {
+    console.log("Windows 스타일 체크박스 렌더링");
+  }
+}
+
+// 3. 구체적인 제품 클래스 (MacOS UI)
+class MacOSButton extends Button {
+  render(): void {
+    console.log("MacOS 스타일 버튼 렌더링");
+  }
+}
+
+class MacOSCheckbox extends Checkbox {
+  render(): void {
+    console.log("MacOS 스타일 체크박스 렌더링");
+  }
+}
+
+// 4. 추상 팩토리 (서로 연관된 제품을 한 번에 생성)
+abstract class UIFactory {
+  abstract createButton(): Button;
+  abstract createCheckbox(): Checkbox;
+}
+
+// 5. 구체적인 팩토리 클래스 (Windows용 UI)
+class WindowsUIFactory extends UIFactory {
+  createButton(): Button {
+    return new WindowsButton();
+  }
+
+  createCheckbox(): Checkbox {
+    return new WindowsCheckbox();
+  }
+}
+
+// 6. 구체적인 팩토리 클래스 (MacOS용 UI)
+class MacOSUIFactory extends UIFactory {
+  createButton(): Button {
+    return new MacOSButton();
+  }
+
+  createCheckbox(): Checkbox {
+    return new MacOSCheckbox();
+  }
+}
+
+// 7. 클라이언트 코드
+function createUI(factory: UIFactory): void {
+  const button = factory.createButton();
+  const checkbox = factory.createCheckbox();
+
+  button.render();
+  checkbox.render();
+}
+
+// 사용 예시
+const factory: UIFactory = new MacOSUIFactory();
+createUI(factory);
+// "MacOS 스타일 버튼 렌더링"
+// "MacOS 스타일 체크박스 렌더링"
+```
+
+</details>
+
+
 
 팩토리 메소드를 추상 클래스로 정의하여 **각 팩토리마다 독립적인 생성 방식 유지**할 수 있습니다. 클라이언트 코드가 특정 팩토리 인스턴스를 선택하여 사용할 수 있도록 유도합니다.&#x20;
 
+<table><thead><tr><th width="130">구분</th><th>팩토리 메서드 (Factory Method)</th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>패턴 유형</td><td>생성 패턴</td><td>생성 패턴</td></tr><tr><td>목적</td><td>하나의 객체를 생성하는 팩토리 메서드를 제공</td><td>관련된 <strong>여러 객체군(Family)</strong>을 생성하는 팩토리를 제공</td></tr><tr><td>구성</td><td>단일 객체 생성을 위한 하위 클래스에서 팩토리 메서드를 구현</td><td>여러 객체를 생성하는 팩토리 클래스 자체를 추상화</td></tr><tr><td>확장성</td><td>새로운 객체 유형을 추가하려면 기존 팩토리 메서드를 수정해야 함</td><td>새로운 객체군을 추가할 때 기존 팩토리를 수정할 필요 없음</td></tr><tr><td>유지보수</td><td>상대적으로 단순한 구조</td><td>보다 복잡한 구조지만 유지보수성이 높음</td></tr><tr><td>사용 사례</td><td>특정 인터페이스를 가진 객체를 동적으로 생성해야 할 때</td><td>특정 제품군(예: UI 컴포넌트, 데이터베이스 등)을 <strong>그룹화</strong>하여 생성할 때</td></tr><tr><td>예제</td><td>ButtonFactory → Button (WindowsButton, MacOSButton)</td><td>UIFactory → Button, Checkbox (WindowsUIFactory, MacOSUIFactory)</td></tr></tbody></table>
 
 
-## 장점 <a href="#benefits" id="benefits"></a>
+
+## 팩토리 메서드 패턴의 장점 <a href="#benefits" id="benefits"></a>
 
 1. **객체 생성 로직을 분리하여 코드 가독성 향상**
 2. **클라이언트 코드의 결합도 낮추기 (Loose Coupling)**
 3. **새로운 객체 타입을 쉽게 추가하여 확장성 증가**
 
+## 팩토리 메서드 패턴의 단점
+
+* 각 제품 구현체마다 팩토리 객체들을 모두 구현해주어야 하기 때문에, 구현체가 늘어날때 마다 팩토리 클래스가 증가하여 서브 클래스 수가 폭발합니다.
+* 코드가 매우 복잡해질 수 있습니다.
+* 단순한 객체 생성에는 오버헤드가 발생할 수 있습니다. (단순한 객체는 new 키워드 사용이 더 적합)
 
 
-## 주의점
 
-* 클래스 수 증가: 각 제품마다 새로운 클래스를 생성해야 하므로 코드가 길어질 수 있음
-* 단순한 객체 생성에는 오버헤드가 발생할 수 있음 (단순한 객체는 new 키워드 사용이 더 적합)
+## 정리
+
+<table><thead><tr><th width="102">구분</th><th>팩토리 (Factory)</th><th>팩토리 메소드 (Factory Method) </th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>핵심 개념</td><td>객체 생성을 위한 단순한 팩토리 함수 또는 클래스</td><td>객체 생성을 위한 하위클래스에서 구현해야 하는 메서드 제공 </td><td>서로 연관된 객체 그룹을 생성하는 팩토리 제공</td></tr><tr><td>구성 요소</td><td><ul><li>팩토리 클래스 또는 함수</li><li>제품 객체</li></ul></td><td><ul><li>팩토리 클래스를 부모로 두고, 하위 클래스에서 구현 </li><li>서브클래스에서 <code>create(</code>)를 구현</li></ul></td><td><ul><li>여러 개의 팩토리 메서드를 포함한 팩토리 클래스</li><li>여러 개의 제품이 생성됨</li></ul></td></tr><tr><td>사용 목적</td><td>단순한 객체 생성 방식 제공</td><td>객체 생성을 하위클래스에서 결정하도록 강제</td><td>객체 계열(Family)을 함께 생성</td></tr><tr><td>확장성</td><td>새로운 제품을 추가할 때 팩토리 로직 수정 필요</td><td>새로운 제품을 추가할 때 새로운 하위 클래스 추가</td><td>새로운 제품군을 추가할 때 새로운 팩토리 추가</td></tr><tr><td>예제</td><td><code>ButtonFactory.createButton("Windows")</code></td><td><code>WindowsButtonFactory.createButton()</code></td><td><code>WindowsUIFactory.createButton()</code>, <code>WindowsUIFactory.createCheckbox()</code></td></tr></tbody></table>
 
 
 
