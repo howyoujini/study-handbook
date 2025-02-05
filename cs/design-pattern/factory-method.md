@@ -14,7 +14,7 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 둘 다 객체 생성을 캡슐화하는 디자인 패턴이지만, 그 방식과 의도에서 차이가 있습니다.
 
-### 팩토리 패턴 (Factory Pattern)
+### 팩토리 패턴 <a href="#factory" id="factory"></a>
 
 객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **단순한 객체 생성을 중앙 집중화할 때** 유용합니다.&#x20;
 
@@ -241,9 +241,11 @@ class UserService {
 
 </details>
 
+이제 `User` 엔티티 말고, 소셜 로그인 인터페이스를 통해 **다양한 제 3자 로그인**을 구현해보겠습니다. 하나의 객체 생성이 아니라 다양한 객체 생성이 필요하겠죠?
 
+<details>
 
-User 객체 이외에, 소셜 로그인 인터페이스를 통해 **다양한 제 3자 로그인**을 구현해보겠습니다.
+<summary>❌ 모든 로그인 객체를 관리하는 SocialLoginFactory 구현</summary>
 
 {% code lineNumbers="true" fullWidth="false" %}
 ```typescript
@@ -302,18 +304,23 @@ const googleLogin = SocialLoginFactory.createLogin("google");
 kakaoLogin.login(); // "카카오 로그인 실행"
 googleLogin.login(); // "구글 로그인 실행"
 googleLogin.login(); // 구글 로그인 실행
+ 
 ```
 {% endcode %}
 
+현재 `SocialLoginFactory` 클래스는 타입에 따라 `KakaoLogin` 객체 생성을, 때론 다른 객체 생성을 합니다. 그래서 OOP의 단일책임원칙에 어긋나고 있습니다. 뿐만 아니라 깃허브 로그인이 추가된다면, 기존 코드에 case 문을 추가해서 생성해야하는 개방-폐쇄 원칙을 위배하고 있습니다.
 
+</details>
 
-<details>
-
-<summary>팩토리 메서드 패턴 (Factory Method Pattern)</summary>
+### 팩토리 메서드 패턴 <a href="#factory-method" id="factory-method"></a>
 
 팩토리 메서드는 객체 **생성을 위한 인터페이스(추상 메서드)**&#xB97C; 정의하고, **하위 클래스가 이를 구현**하여 객체를 생성하도록 하는 방식입니다. 즉, 객체 생성을 하위 클래스에서 결정하도록 유도하여, **개방-폐쇄 원칙(OCP)**&#xC744; 따르게 합니다. 이렇게 되면 **확장 가능성이 높아 새로운 객체 타입을 추가하기 쉽습**니다.&#x20;
 
-소셜 로그인 인터페이스와 소셜 로그인 추상클래스를 통해 **다양한 제 3자 로그인을 구현해보겠습니다.**
+소셜 로그인 인터페이스와 **소셜 로그인 팩토리 추상클래스**를 통해 **다양한 제 3자 로그인을 구현해보겠습니다.**
+
+<details>
+
+<summary>✅ 추상 클래스 SocialLoginFactory</summary>
 
 {% code lineNumbers="true" %}
 ```typescript
@@ -381,13 +388,15 @@ class AppleLoginFactory extends SocialLoginFactory {
 const kakaoFactory = new KakaoLoginFactory();
 const googleFactory = new GoogleLoginFactory();
 
-const kakaoLogin = kakaoFactory.createLogin();
-const googleLogin = googleFactory.createLogin();
+const kakaoLogin = kakaoFactory.createLogin(); // SocialLogin
+const googleLogin = googleFactory.createLogin(); // SocialLogin
 
 kakaoLogin.login(); // "카카오 로그인 실행"
 googleLogin.login(); // "구글 로그인 실행"
 ```
 {% endcode %}
+
+만약 깃허브 로그인이 추가된다면, SocialLoginFactory를 확장하여 GithubLoginFactory 클래스만 추가해주면 됩니다.
 
 </details>
 
@@ -398,16 +407,16 @@ googleLogin.login(); // "구글 로그인 실행"
 ## 주요 특징 <a href="#features" id="features"></a>
 
 1. **객체 생성 로직을 캡슐화** → 객체 생성을 직접 하지 않고, **팩토리 메소드를 통해** 생성
-2. **유연한 확장성** → 새로운 객체 타입이 추가되더라도 기존 코드 수정 없이 확장 가능
+2. **유연한 확장성** → 새로운 객체 타입이 추가되더라도 **기존 코드 수정 없이** 확장 가능
 3. **결합도 낮추기** → 클라이언트 코드가 구체적인 클래스를 몰라도 객체를 생성할 수 있도록 유도
 
 ## 언제 활용할 수 있을까? <a href="#use-cases" id="use-cases"></a>
 
-싱글톤 패턴에 비해 팩토리 메서드 패턴을 언제 활용할 수 있을지 이해하는 것이 어려웠습니다. 하지만 **비슷한 객체를 반복적으로(공장처럼) 생성해야 할 경우**에 팩토리 메서드 패턴 사용을 고려해본다고 생각하니 이해가 쉬워졌습니다. 또 개발자가 컴파일 단계에서 어떤 객체를 생성해야할 지 모르고, **런타임 단계에서 동적으로 생성해야 할 때**도 사용할 수 있습니다.
+싱글톤 패턴에 비해 **팩토리 메서드 패턴**을 언제 활용할 수 있을지 이해하는 것이 어려웠습니다. 하지만 **비슷한 객체를 반복적으로(공장처럼) 생성해야 할 경우**에 팩토리 메서드 패턴 사용을 고려해본다고 생각하니 이해가 쉬워졌습니다. 또 개발자가 컴파일 단계에서 어떤 객체를 생성해야할 지 모르고, **런타임 단계에서 동적으로 객체를 생성해야 할 때**도 사용할 수 있습니다.
 
 <details>
 
-<summary>플랫폼(Windows, MacOS) 환경에 따라 다른 버튼을 생성해하는 경우</summary>
+<summary>플랫폼(Windows, MacOS 등) 환경에 따라 다른 버튼을 생성해하는 경우</summary>
 
 OS마다 UI 컴포넌트가 다르기 때문에 Button을 직접 생성하면 OS별 분기 처리가 필요합니다. 이 경우 팩토리 메소드 패턴을 활용하면 OS별 버튼을 쉽게 추가할 수 있습니다. 자바스크립트의 `class`를 활용하여 버튼 인터페이스를 만들어보겠습니다.&#x20;
 
@@ -483,7 +492,7 @@ OS에 따라 적절한 버튼을 생성하여 렌더링할 수 있게 되었습�
 
 <details>
 
-<summary>다양한 데이터베이스(MySQL, PostgreSQL)를 지원해하는 경우</summary>
+<summary>다양한 데이터베이스(MySQL, PostgreSQL 등)를 지원해하는 경우</summary>
 
 어떤 애플리케이션이 다양한 데이터베이스를 지원해야 할 때, 팩토리 메소드 패턴을 사용하면 코드의 변경 없이 쉽게 확장할 수 있습니다.&#x20;
 
@@ -552,49 +561,17 @@ getDatabaseConnection("PostgreSQL"); // PostgreSQL 데이터베이스에 연결�
 
 </details>
 
+<details>
 
+<summary>다양한 소셜로그인(Kakao, Naver 등)을 지원해야하는 경우</summary>
+
+
+
+</details>
 
 
 
 ## 구현 방법 <a href="#implementation" id="implementation"></a>
-
-팩토리 메소드 패턴을 구현하는 방법은 여러 가지가 있습니다. 대표적인 3가지 방법을 살펴보겠습니다.
-
-### 1. Factory 클래스 기반 switch 문  <a href="#factory" id="factory"></a>
-
-<pre class="language-javascript"><code class="lang-javascript"><strong>class Product {
-</strong>  constructor(name) {
-    this.name = name;
-  }
-
-  use() {
-    console.log(`${this.name} 제품을 사용합니다.`);
-  }
-}
-
-<strong>class ProductFactory {
-</strong>  static createProduct(type) {
-    switch (type) {
-      case "A":
-        return new Product("상품 A");
-      case "B":
-        return new Product("상품 B");
-      default:
-        throw new Error("존재하지 않는 상품 타입입니다.");
-    }
-  }
-}
-
-const productA = ProductFactory.createProduct("A");
-const productB = ProductFactory.createProduct("B");
-
-productA.use(); // "상품 A 제품을 사용합니다."
-productB.use(); // "상품 B 제품을 사용합니다."
-</code></pre>
-
-`ProductFactory`가 객체 생성을 담당하며, 클라이언트는 `createProduct()` 메소드를 통해 제품을 생성합니다. 새로운 제품이 추가될 경우, 팩토리 클래스의 **`switch` 문을 수정**해야 합니다. 이는 **OCP(개방-폐쇄 원칙)에 위배**될 수 있으므로, 이를 해결하기 위한 다른 방식을 살펴보겠습니다.&#x20;
-
-### 2. 인터페이스 기반  <a href="#interface" id="interface"></a>
 
 ```javascript
 class Product {
@@ -699,5 +676,3 @@ productB.use(); // "상품 B 제품을 사용합니다."
 #### **참고 자료**
 
 {% embed url="https://refactoring.guru/ko/design-patterns/factory-method" %}
-
-{% embed url="https://youtu.be/ejXUhFKcbIU?si=sHVreG5FawjZYBF_" %}

@@ -39,35 +39,42 @@ description: 하나의 클래스에 오직 하나의 인스턴스만 가지는 �
 
 **🔍 싱글톤 DB Connection 구현 예제 (Node.js)**
 
-```javascript
-const mysql = require("mysql2");
+{% code lineNumbers="true" %}
+```typescript
+import mysql, { Connection } from "mysql2";
 
 class Database {
-  static instance;
-  
-  constructor() {
+  private static instance: Database | null = null; 
+  private connection: Connection; 
+
+  private constructor() {
+    this.connection = mysql.createConnection({
+      host: "localhost",
+      user: "root",
+      password: "password",
+      database: "mydb",
+    });
+  }
+
+  static getInstance(): Database {
     if (!Database.instance) {
-      this.connection = mysql.createConnection({
-        host: "localhost",
-        user: "root",
-        password: "password",
-        database: "mydb",
-      });
-      Database.instance = this;
+      Database.instance = new Database();
     }
-    
     return Database.instance;
   }
 
-  getConnection() {
+  getConnection(): Connection {
     return this.connection;
   }
 }
 
-const db1 = new Database();
-const db2 = new Database();
+// 사용 예시
+const db1 = Database.getInstance();
+const db2 = Database.getInstance();
 console.log(db1.getConnection() === db2.getConnection()); // true (같은 DB 연결 사용)
+
 ```
+{% endcode %}
 
 </details>
 
@@ -86,33 +93,41 @@ console.log(db1.getConnection() === db2.getConnection()); // true (같은 DB 연
 
 **🔍 싱글톤 Config Manager 구현 예제**
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Config {
-  static instance;
-  
-  constructor() {
+  private static instance: Config | null = null; 
+  private settings: { theme: string; language: string }; 
+
+  private constructor() {
+    this.settings = { theme: "dark", language: "en" }; 
+  }
+
+  static getInstance(): Config {
     if (!Config.instance) {
-      this.settings = { theme: "dark", language: "en" };
-      Config.instance = this;
+      Config.instance = new Config();
     }
     return Config.instance;
   }
 
-  getConfig() {
+  getConfig(): { theme: string; language: string } {
     return this.settings;
   }
 
-  updateConfig(newConfig) {
+  updateConfig(newConfig: Partial<typeof this.settings>): void {
     this.settings = { ...this.settings, ...newConfig };
   }
 }
 
-const config1 = new Config();
+// 사용 예시
+const config1 = Config.getInstance();
 config1.updateConfig({ theme: "light" });
 
-const config2 = new Config();
+const config2 = Config.getInstance();
 console.log(config2.getConfig()); // { theme: "light", language: "en" } (같은 객체 공유)
+
 ```
+{% endcode %}
 
 </details>
 
@@ -132,39 +147,48 @@ console.log(config2.getConfig()); // { theme: "light", language: "en" } (같은 
 
 **🔍 싱글톤 Logger 구현 예제 (JavaScript)**
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Logger {
-  static instance;
-  
-  constructor() {
+  private static instance: Logger | null = null; 
+  private logs: string[]; 
+
+  private constructor() {
+    this.logs = []; 
+  }
+
+  static getInstance(): Logger {
     if (!Logger.instance) {
-      this.logs = [];
-      Logger.instance = this;
+      Logger.instance = new Logger();
     }
     return Logger.instance;
   }
 
-  log(message) {
+  log(message: string): void {
     this.logs.push(message);
     console.log(`[LOG]: ${message}`);
   }
 
-  getLogs() {
+  getLogs(): string[] {
     return this.logs;
   }
 }
 
-const logger1 = new Logger();
-const logger2 = new Logger();
-const logger3 = new Logger()
+// 사용 예시
+const logger1 = Logger.getInstance();
+const logger2 = Logger.getInstance();
+const logger3 = Logger.getInstance();
+
 logger1.log("Only one Logger!");
 
 console.log(logger1 === logger2); // true (같은 객체 공유)
-console.log(logger1 === logger3); // true 
-console.log(logger1.logs); // ["Only one Logger!"]
-console.log(logger2.logs); // ["Only one Logger!"]
-console.log(logger3.logs); // ["Only one Logger!"]
+console.log(logger1 === logger3); // true (같은 객체 공유)
+console.log(logger1.getLogs()); // ["Only one Logger!"]
+console.log(logger2.getLogs()); // ["Only one Logger!"]
+console.log(logger3.getLogs()); // ["Only one Logger!"]
+
 ```
+{% endcode %}
 
 </details>
 
@@ -183,7 +207,8 @@ console.log(logger3.logs); // ["Only one Logger!"]
 
 🔍 **Redux Store를 싱글톤으로 활용하는 예제**
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 import { configureStore } from "@reduxjs/toolkit";
 import counterReducer from "./counterSlice";
 
@@ -191,8 +216,14 @@ const store = configureStore({
   reducer: { counter: counterReducer },
 });
 
-export default store; // 싱글톤 Store 인스턴스를 export
+// RootState 및 AppDispatch 타입 생성 (타입 안정성 추가)
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
+export default store; // 싱글턴 Store 인스턴스를 export
+
 ```
+{% endcode %}
 
 </details>
 
@@ -202,99 +233,118 @@ export default store; // 싱글톤 Store 인스턴스를 export
 
 ### 1. static instance <a href="#static-instance" id="static-instance"></a>
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Singleton {
-  static instance; // 단 하나의 인스턴스를 저장할 변수
+  private static instance: Singleton | null = null; // 단 하나의 인스턴스를 저장할 변수
 
-  constructor() {
-    if (Singleton.instance) { // 인스턴스가 이미 있다면,
-      return Singleton.instance; // 기존 인스턴스를 반환
-    }
-    Singleton.instance = this; // 새로운 인스턴스를 저장
+  private constructor() {
+    // 생성자를 private으로 만들어 외부에서 new로 인스턴스 생성 방지
   }
 
-  sayHello() {
-    console.log("Hello from Singleton!");
-  }
-}
-
-const obj1 = new Singleton();
-const obj2 = new Singleton();
-
-console.log(obj1 === obj2); // true (같은 객체를 공유)
-obj1.sayHello(); // "Hello from Singleton!"
-```
-
-`Singleton` 클래스는 `instance`라는 **정적 변수**를 가집니다. `new`를 사용해 새로운 객체를 생성하면, 생성자 함수가 기존에 `instance`가 존재하면 새로운 객체를 만들지 않고 기존 객체를 반환하도록 합니다. 그리고 `instance`가 없다면 새로운 객체를 생성하게 됩니다. 따라서 여러 번 `new Singleton()`을 호출해도 **항상 같은 객체를 참조**하게 됩니다.
-
-### 2. getInstance() <a href="#get-instance" id="get-instance"></a>
-
-생성자를 `private`으로 두고, `getInstance()` 메서드로 접근하는 방식을 더 많이 권장하고 있습니다. 왜냐하면 `static instance` 변수를 사용해 싱글톤 패턴을 구현하면, 클라이언트 코드가 직접 `instance` 변수에 접근할 위험이 있기 때문입니다.&#x20;
-
-```javascript
-class Singleton {
-  static instance = null;
-
-  constructor() {
-    if (Singleton.instance) {
-      throw new Error("Use Singleton.getInstance() instead of new!");
-    }
-    Singleton.instance = this;
-  }
-
-  static getInstance() {
+  static getInstance(): Singleton {
     if (!Singleton.instance) {
       Singleton.instance = new Singleton();
     }
     return Singleton.instance;
   }
 
-  sayHello() {
+  sayHello(): void {
     console.log("Hello from Singleton!");
   }
 }
 
+// 사용 예시
+const obj1 = Singleton.getInstance();
+const obj2 = Singleton.getInstance();
+
+console.log(obj1 === obj2); // true (같은 객체를 공유)
+obj1.sayHello(); // "Hello from Singleton!"
+
+```
+{% endcode %}
+
+`Singleton` 클래스는 `instance`라는 **정적 변수**를 가집니다. `new`를 사용해 새로운 객체를 생성하면, 생성자 함수가 기존에 `instance`가 존재하면 새로운 객체를 만들지 않고 기존 객체를 반환하도록 합니다. 그리고 `instance`가 없다면 새로운 객체를 생성하게 됩니다. 따라서 여러 번 `new Singleton()`을 호출해도 **항상 같은 객체를 참조**하게 됩니다.
+
+### 2. getInstance() <a href="#get-instance" id="get-instance"></a>
+
+생성자를 `private`으로 두고, `getInstance()` 메서드로 접근하는 방식을 더 많이 권장하고 있습니다. 왜냐하면 `static instance` 변수를 사용해 싱글톤 패턴을 구현하면, 클라이언트 코드가 직접 `instance` 변수에 접근할 위험이 있기 때문입니다. (물론 `TypeScript`인 경우, `private`으로 선언할 수 있기 때문에 위험이 적어집니다.)
+
+{% code lineNumbers="true" %}
+```typescript
+class Singleton {
+  private static instance: Singleton | null = null; 
+
+  private constructor() {
+    if (Singleton.instance) {
+      throw new Error("Use Singleton.getInstance() instead of new!");
+    }
+  }
+
+  static getInstance(): Singleton {
+    if (!Singleton.instance) {
+      Singleton.instance = new Singleton();
+    }
+    return Singleton.instance;
+  }
+
+  sayHello(): void {
+    console.log("Hello from Singleton!");
+  }
+}
+
+// 사용 예시
 const obj1 = Singleton.getInstance();
 const obj2 = Singleton.getInstance();
 
 console.log(obj1 === obj2); // true (항상 같은 인스턴스 반환)
+obj1.sayHello(); // "Hello from Singleton!"
+
 ```
+{% endcode %}
 
 `getInstance()`를 통해서만 인스턴스를 생성할 수 있도록 제한합니다. 즉, `new Singleton()`을 직접 호출하면 에러가 발생되도록 하여 **`new` 키워드를 사용하는 것을 방지**합니다. `Singleton.getInstance()`를 호출하면 항상 동일한 인스턴스를 반환합니다.
 
 ### 3. 전역 설정 객체 <a href="#global-states" id="global-states"></a>
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Config {
-  static instance;
-  configData = {};
+  private static instance: Config | null = null; 
+  private configData: { theme: string; language: string }; 
 
-  constructor() {
+  private constructor() {
+    this.configData = { theme: "dark", language: "en" }; 
+  }
+
+  static getInstance(): Config {
     if (!Config.instance) {
-      Config.instance = this;
-      this.configData = { theme: "dark", language: "en" };
+      Config.instance = new Config();
     }
     return Config.instance;
   }
 
-  getConfig() {
+  getConfig(): { theme: string; language: string } {
     return this.configData;
   }
 
-  updateConfig(newConfig) {
+  updateConfig(newConfig: Partial<typeof this.configData>): void {
     this.configData = { ...this.configData, ...newConfig };
   }
 }
 
-const config1 = new Config();
-const config2 = new Config();
+// 사용 예시
+const config1 = Config.getInstance();
+const config2 = Config.getInstance();
 
 console.log(config1.getConfig()); // { theme: "dark", language: "en" }
 config1.updateConfig({ theme: "light" });
 
 console.log(config2.getConfig()); // { theme: "light", language: "en" } (같은 객체를 공유)
 console.log(config1 === config2); // true (같은 인스턴스)
+
 ```
+{% endcode %}
 
 `configData`를 전역적으로 관리하여 설정을 공유할 수 있습니다. `updateConfig()`로 설정을 변경하면, **참조하고 있는 다른 곳에서도 변경 사항이 반영**됩니다. 즉, `config1`과 `config2`는 같은 인스턴스를 공유하게 됩니다.&#x20;
 
@@ -347,6 +397,7 @@ Redis, Memcached 등을 사용하면 서버 간 캐싱 데이터 일관성을 �
 
 Java, C++ 같은 **멀티스레드 환경에서** 싱글톤 객체를 **동시 접근**하면, 여러 스레드가 동시에 인스턴스를 생성할 가능성이 있습니다. 즉, **경쟁 조건(Race Condition)**&#xC774; 발생하면, 싱글톤이 깨지고  락(Lock) 사용이 필요할 수 있습니다.
 
+{% code lineNumbers="true" %}
 ```java
 // Java 예제
 public class Singleton {
@@ -365,7 +416,9 @@ public class Singleton {
         return instance;
     }
 }
+
 ```
+{% endcode %}
 
 **✅** Java 의 경우, **synchronized** 키워드를 사용하여 멀티스레드 환경에서도 안전하게 동작하도록 합니다.
 
@@ -375,71 +428,84 @@ public class Singleton {
 
 싱글톤 객체를 변경하면 여러 곳에서 영향을 받기 때문에 모듈 간의 의존성이 증가합니다. 즉, 특정 테스트가 싱글톤의 상태를 변경하면, 다른 테스트에 영향을 줄 수 있기 때문에 **테스트하기 어렵**습니다.
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Database {
-  static instance;
-  data = [];
+  private static instance: Database | null = null;
+  private data: string[];
 
-  constructor() {
+  private constructor() {
+    this.data = [];
+  }
+
+  static getInstance(): Database {
     if (!Database.instance) {
-      Database.instance = this;
+      Database.instance = new Database();
     }
     return Database.instance;
   }
 
-  addData(record) {
+  addData(record: string): void {
     this.data.push(record);
   }
 
-  getData() {
+  getData(): string[] {
     return this.data;
   }
 }
 
-// 테스트 코드
-const db1 = new Database();
+const db1 = Database.getInstance();
 db1.addData("Test Record");
 
-const db2 = new Database();
-console.log(db2.getData()); // ["Test Record"] (다른 테스트에도 영향)
+const db2 = Database.getInstance();
+console.log(db2.getData()); // ["Test Record"] (같은 인스턴스를 공유)
+
 ```
+{% endcode %}
 
 `db1`에서 데이터를 추가했더니 `db2`에서도 같은 데이터를 공유합니다. 테스트 환경에서는 싱글톤을 Mock 객체로 대체해보겠습니다. 필요할 경우, 리셋 가능한 싱글톤 객체를 만들 수도 있습니다.
 
+{% code lineNumbers="true" %}
 ```javascript
 class Database {
-  static instance;
-  data = [];
+  private static instance: Database | null = null; 
+  private data: string[]; 
 
-  constructor() {
+  private constructor() {
+    this.data = []; 
+  }
+
+  static getInstance(): Database {
     if (!Database.instance) {
-      Database.instance = this;
+      Database.instance = new Database();
     }
     return Database.instance;
   }
 
-  addData(record) {
+  addData(record: string): void {
     this.data.push(record);
   }
 
-  getData() {
+  getData(): string[] {
     return this.data;
   }
 
-  reset() { // 테스트를 위해 리셋 기능 추가
+  reset(): void { 
     this.data = [];
   }
 }
 
 // 테스트 코드
-const db1 = new Database();
+const db1 = Database.getInstance();
 db1.addData("Test Record");
 
 console.log(db1.getData()); // ["Test Record"]
 
 db1.reset(); // 테스트 간 데이터 초기화
 console.log(db1.getData()); // [] (다시 초기화됨)
+
 ```
+{% endcode %}
 
 ✅ `reset()` 메서드를 추가하여 테스트 간 데이터 공유 문제를 해결할 수 있습니다.
 
@@ -447,58 +513,77 @@ console.log(db1.getData()); // [] (다시 초기화됨)
 
 싱글톤 객체는 전역적으로 공유되기 때문에, 프로그램의 여러 부분에서 동일한 데이터를 변경할 수 있습니다. 특정 코드에서 싱글톤의 상태를 변경하면 모든 코드에 영향을 미칠 수 있기 때문에 Side Effect(부작용) 발생 가능성이 높아지고, 디버깅이 어려워질 가능성이 있습니다.&#x20;
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Singleton {
-  constructor() {
+  private static instance: Singleton | null = null;
+  private config: { theme: string };
+
+  private constructor() {
+    this.config = { theme: "dark" };
+  }
+
+  static getInstance(): Singleton {
     if (!Singleton.instance) {
-      Singleton.instance = this;
-      this.config = { theme: "dark" };
+      Singleton.instance = new Singleton();
     }
     return Singleton.instance;
   }
 
-  updateTheme(theme) {
+  updateTheme(theme: string): void {
     this.config.theme = theme;
   }
-}
 
-const instance1 = new Singleton();
-const instance2 = new Singleton();
-
-instance1.updateTheme("light"); 
-console.log(instance2.config.theme); // "light" (예상과 다르게 변경됨)
-```
-
-instance1에서 테마를 변경했더니 instance2에도 영향을 줍니다.&#x20;
-
-전역 상태를 직접 변경하지 않고, Immutable(불변) 상태 관리 기법을 적용하는
-
-Redux/Zustand 같은 상태 관리 라이브러리를 활용해보겠습니다.&#x20;
-
-```javascript
-class Singleton {
-  static instance;
-  config;
-
-  constructor() {
-    if (!Singleton.instance) {
-      Singleton.instance = this;
-      this.config = Object.freeze({ theme: "dark" }); // 변경 불가능한 상태
-    }
-    return Singleton.instance;
-  }
-
-  getConfig() {
+  getConfig(): { theme: string } {
     return this.config;
   }
 }
 
-const instance1 = new Singleton();
+// 사용 예시
+const instance1 = Singleton.getInstance();
+const instance2 = Singleton.getInstance();
+
+instance1.updateTheme("light");
+console.log(instance2.getConfig().theme); // "light" (예상과 다르게 변경됨)
+
+```
+{% endcode %}
+
+instance1에서 테마를 변경했더니 instance2에도 영향을 줍니다.&#x20;
+
+전역 상태를 직접 변경하지 않고, Immutable(불변) 상태 관리 기법을 적용해보겠습니다.&#x20;
+
+{% code lineNumbers="true" %}
+```typescript
+class Singleton {
+  private static instance: Singleton | null = null;
+  private config: Readonly<{ theme: string }>;
+
+  private constructor() {
+    this.config = Object.freeze({ theme: "dark" }); // 변경 불가능한 상태
+  }
+
+  static getInstance(): Singleton {
+    if (!Singleton.instance) {
+      Singleton.instance = new Singleton();
+    }
+    return Singleton.instance;
+  }
+
+  getConfig(): Readonly<{ theme: string }> {
+    return this.config;
+  }
+}
+
+// 사용 예시
+const instance1 = Singleton.getInstance();
 console.log(instance1.getConfig().theme); // "dark"
 
-instance1.getConfig().theme = "light"; // 변경 시도해도 반영 안됨
+(instance1.getConfig() as any).theme = "light"; // 변경 시도해도 반영 안됨
 console.log(instance1.getConfig().theme); // "dark"
+
 ```
+{% endcode %}
 
 ✅ **Immutable 객체** `Object.freeze()`를 사용하여 수정 불가능하게 할 수 있습니다.&#x20;
 
@@ -506,50 +591,64 @@ console.log(instance1.getConfig().theme); // "dark"
 
 싱글톤 인스턴스가 여러 곳에서 직접 참조되면, **모듈 간 강한 의존성(결합도, Coupling)**&#xC774; 생깁니다. 즉, 나중에 다중 인스턴스를 만들고 싶어도 어려울 수 있습니다. 더불어 한 번에 두 가지의 문제를 동시에 해결하기 때문에 단일 책임 원칙(SRP, Single Responsibility Principle)을 위배할 수 있습니다.
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Logger {
-  static instance;
+  private static instance: Logger | null = null;
 
-  constructor() {
+  private constructor() {}
+
+  static getInstance(): Logger {
     if (!Logger.instance) {
-      Logger.instance = this;
+      Logger.instance = new Logger();
     }
     return Logger.instance;
   }
 
-  log(message) {
+  log(message: string): void {
     console.log(`LOG: ${message}`);
   }
 }
 
 class Service {
+  private logger: Logger;
+
   constructor() {
-    this.logger = new Logger(); // 직접 싱글톤 인스턴스를 사용
+    this.logger = Logger.getInstance(); // 싱글턴 인스턴스를 가져옴
   }
 
-  process() {
+  process(): void {
     this.logger.log("Processing data...");
   }
 }
+
+// 사용 예시
+const service = new Service();
+service.process(); // LOG: Processing data...
+
 ```
+{% endcode %}
 
 Service 클래스가 Logger 싱글톤에 강하게 결합되어 있습니다.
 
 **의존성 주입(Dependency Injection, DI)**&#xC744; 사용하여 결합도를 줄여보겠습니다.&#x20;
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 class Logger {
-  log(message) {
+  log(message: string): void {
     console.log(`LOG: ${message}`);
   }
 }
 
 class Service {
-  constructor(logger) {
+  private logger: Logger;
+
+  constructor(logger: Logger) {
     this.logger = logger;
   }
 
-  process() {
+  process(): void {
     this.logger.log("Processing data...");
   }
 }
@@ -558,7 +657,9 @@ class Service {
 const loggerInstance = new Logger();
 const service = new Service(loggerInstance);
 service.process(); // "LOG: Processing data..."
+
 ```
+{% endcode %}
 
 ✅ `Logger`를 직접 참조하지 않고, **외부에서 주입**받도록 수정하여 유연성을 증가시킬 수 있습니다.
 
@@ -576,27 +677,45 @@ service.process(); // "LOG: Processing data..."
 
 ES6 모듈 시스템을 이용하면 자동으로 싱글톤처럼 동작합니다.&#x20;
 
-```javascript
-// singleton.js (싱글톤 모듈)
+{% code title="singleton.ts" lineNumbers="true" %}
+```typescript
 class Singleton {
-  constructor() {
+  private static instance: Singleton | null = null;
+  private value: number;
+
+  private constructor() {
     this.value = Math.random(); // 객체가 생성될 때 랜덤값 설정
+  }
+
+  static getInstance(): Singleton {
+    if (!Singleton.instance) {
+      Singleton.instance = new Singleton();
+    }
+    return Singleton.instance;
+  }
+
+  getValue(): number {
+    return this.value;
   }
 }
 
-export default new Singleton(); // 싱글톤 인스턴스 내보내기
-```
+export default Singleton.getInstance(); // 싱글톤 인스턴스 내보내기
 
-```javascript
-// main.js
-import singleton from './singleton.js';
+```
+{% endcode %}
+
+{% code title="main.ts" lineNumbers="true" %}
+```typescript
+import singleton from "./singleton";
 
 console.log(singleton.getValue()); // 예: 0.2453
 console.log(singleton.getValue()); // 같은 값 반환 (싱글톤 유지)
 
-import singleton2 from "./singleton.js";
+import singleton2 from "./singleton";
 console.log(singleton === singleton2); // true (같은 인스턴스)
+
 ```
+{% endcode %}
 
 ES6 모듈 시스템에서는 `export default`로 한 번 생성된 객체가 캐싱되기 때문에 새로운 인스턴스를 만들지 않고 유지됩니다. 하지만 전역 상태를 공유하는 패턴이므로 사용 시 신중해야 하며, ES6 모듈 시스템이나 의존성 주입 기법과 함께 활용하면 더 안전하게 사용할 수 있습니다.&#x20;
 
@@ -614,8 +733,10 @@ Redux의 store 자체가 싱글톤 패턴을 기반으로 동작합니다.
 
 `createStore`나 `configureStore`를 호출하면 하나의 `store` 인스턴스만 유지하고, 모든 컴포넌트가 이 `store`를 공유한다.
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 import { configureStore } from "@reduxjs/toolkit";
+import counterReducer from "./counterSlice"; 
 
 const store = configureStore({
   reducer: {
@@ -623,23 +744,37 @@ const store = configureStore({
   },
 });
 
+// RootState 및 AppDispatch 타입 정의
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;
+
 export default store; // 싱글톤 인스턴스로 export
+
 ```
+{% endcode %}
 
 ### Zustand에서 싱글톤 패턴 적용
 
 Zustand도 기본적으로 하나의 `store` 인스턴스를 유지하며 싱글톤처럼 동작합니다.
 
-```javascript
+{% code lineNumbers="true" %}
+```typescript
 import create from "zustand";
 
-const useStore = create((set) => ({
+interface StoreState {
+  count: number;
+  increase: () => void;
+}
+
+const useStore = create<StoreState>((set) => ({
   count: 0,
   increase: () => set((state) => ({ count: state.count + 1 })),
 }));
 
 export default useStore; // 싱글톤 Store 인스턴스를 export
+
 ```
+{% endcode %}
 
 ### Redux vs Zustand 싱글톤 활용 차이점
 
