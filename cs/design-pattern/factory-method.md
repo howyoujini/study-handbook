@@ -60,19 +60,23 @@ class User {
   }
 
   getProfile(): string {
-    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}, 나이: ${this.dto.age ?? "미입력"}`;
+    return `이름: ${this.name}, 이메일: ${this.email}, 나이: ${this.age ?? "미입력"}`;
   }
 }
 
-// 3. UserFactory (팩토리 클래스)
-class UserFactory {
-  static createUser(dto: UserDto): User {
-    dto.validate(); // ✅ UserDto의 유효성 검사 실행
+class UserService {
+  signIn(dto: UserDto): User {
+    console.log("UserService를 통해 User 로그인");
+    return new User(dto);
+  }
+  
+  signUp(dto: UserDto): User {
+    console.log("UserService를 통해 User 회원가입");
     return new User(dto);
   }
 }
 
-// 4. 사용 예시
+// 3. 사용 예시
 const userDto = new UserDto(1, "Ella", "ella@example.com", 25);
 const user = UserFactory.createUser(userDto);
 
