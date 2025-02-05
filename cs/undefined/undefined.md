@@ -200,7 +200,7 @@ export default store; // 싱글톤 Store 인스턴스를 export
 
 싱글톤 패턴을 구현하는 방식은 여러 가지가 있습니다. 가장 많이 사용되는 3가지 방법을 살펴보겠습니다.&#x20;
 
-### 1. static instance
+### 1. static instance <a href="#static-instance" id="static-instance"></a>
 
 ```javascript
 class Singleton {
@@ -227,7 +227,7 @@ obj1.sayHello(); // "Hello from Singleton!"
 
 `Singleton` 클래스는 `instance`라는 **정적 변수**를 가집니다. `new`를 사용해 새로운 객체를 생성하면, 생성자 함수가 기존에 `instance`가 존재하면 새로운 객체를 만들지 않고 기존 객체를 반환하도록 합니다. 그리고 `instance`가 없다면 새로운 객체를 생성하게 됩니다. 따라서 여러 번 `new Singleton()`을 호출해도 **항상 같은 객체를 참조**하게 됩니다.
 
-### 2. getInstance()
+### 2. getInstance() <a href="#get-instance" id="get-instance"></a>
 
 생성자를 `private`으로 두고, `getInstance()` 메서드로 접근하는 방식을 더 많이 권장하고 있습니다. 왜냐하면 `static instance` 변수를 사용해 싱글톤 패턴을 구현하면, 클라이언트 코드가 직접 `instance` 변수에 접근할 위험이 있기 때문입니다.&#x20;
 
@@ -262,7 +262,7 @@ console.log(obj1 === obj2); // true (항상 같은 인스턴스 반환)
 
 `getInstance()`를 통해서만 인스턴스를 생성할 수 있도록 제한합니다. 즉, `new Singleton()`을 직접 호출하면 에러가 발생되도록 하여 **`new` 키워드를 사용하는 것을 방지**합니다. `Singleton.getInstance()`를 호출하면 항상 동일한 인스턴스를 반환합니다.
 
-### 3. 전역 설정 객체 <a href="#id-3.-global-states" id="id-3.-global-states"></a>
+### 3. 전역 설정 객체 <a href="#global-states" id="global-states"></a>
 
 ```javascript
 class Config {
@@ -304,7 +304,7 @@ console.log(config1 === config2); // true (같은 인스턴스)
 
 ## 성능 최적화 측면에서의 장점 <a href="#benefits" id="benefits"></a>
 
-### 1. 객체 생성을 한 번만 수행하여 불필요한 메모리 낭비 방지
+### 1. 객체 생성을 한 번만 수행하여 불필요한 메모리 낭비 방지 <a href="#unnecessary-instance" id="unnecessary-instance"></a>
 
 매번 `new`를 호출하여 새로운 객체를 생성하는 대신, 하나의 인스턴스를 재사용하여 메모리 사용을 줄입니다. 특히, 데이터베이스 연결, 네트워크 요청, 설정 관리 등의 무거운 객체를 효율적으로 관리 가능합니다.&#x20;
 
@@ -320,7 +320,7 @@ console.log(config1 === config2); // true (같은 인스턴스)
 
 생성 비용이 높은 객체(예: Thread, Database Connection, Network Client)를 재사용할 수 있도록, 오브젝트 풀링과 함께 활용하면 추가적인 최적화를 할 수 있습니다. ThreadPoolExecutor 같은 Java의 쓰레드 풀도 비슷한 원리로 동작합니다.
 
-### 3. 캐싱을 활용한 성능 개선
+### 3. 캐싱을 활용한 성능 개선 <a href="#caching" id="caching"></a>
 
 API 요청 결과나 설정 값을 캐싱하여 불필요한 연산을 줄이며 중복 데이터 처리를 하지 않고 속도를 향상시킬 수 있습니다. 또한 데이터베이스에서 자주 조회하는 값(예: 사용자 설정, 권한 정보)을 캐싱하여 성능을 개선할 수 있습니다.
 
