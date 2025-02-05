@@ -4,7 +4,7 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 # 팩토리 메서드 (Factory Method)
 
-<figure><img src="../../.gitbook/assets/image.png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/factory-method">https://refactoring.guru/ko/design-patterns/factory-method</a></p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/factory-method">https://refactoring.guru/ko/design-patterns/factory-method</a></p></figcaption></figure>
 
 팩토리 메소드 패턴(Factory Method Pattern)은 객체 **생성을 캡슐화**하여, 하위클래스에서 객체의 **생성 방식을 결정하도록 하는 디자인 패턴**입니다. 즉, 객체를 직접 생성하는 것이 아니라, **객체 생성을 담당하는 메소드를 통해 객체를 반환**하도록 합니다. 이 패턴을 활용하면 클라이언트 코드가 특정 클래스의 인스턴스를 직접 생성하지 않고, 추상화된 인터페이스를 통해 객체를 생성할 수 있습니다.
 
@@ -802,7 +802,7 @@ createUI(factory);
 
 ## 정리 <a href="#summary" id="summary"></a>
 
-<table><thead><tr><th width="102">구분</th><th>팩토리 (Factory)</th><th>팩토리 메소드 (Factory Method) </th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>핵심 개념</td><td>객체 생성을 위한 단순한 팩토리 함수 또는 클래스</td><td>객체 생성을 위한 하위클래스에서 구현해야 하는 메서드 제공 </td><td>서로 연관된 객체 그룹을 생성하는 팩토리 제공</td></tr><tr><td>구성 요소</td><td><ul><li>팩토리 클래스 또는 함수</li><li>제품 객체</li></ul></td><td><ul><li>팩토리 클래스를 부모로 두고, 하위 클래스에서 구현 </li><li>서브클래스에서 <code>create(</code>)를 구현</li></ul></td><td><ul><li>여러 개의 팩토리 메서드를 포함한 팩토리 클래스</li><li>여러 개의 제품이 생성됨</li></ul></td></tr><tr><td>사용 목적</td><td>단순한 객체 생성 방식 제공</td><td>객체 생성을 하위클래스에서 결정하도록 강제</td><td>객체 계열(Family)을 함께 생성</td></tr><tr><td>확장성</td><td>새로운 제품을 추가할 때 팩토리 로직 수정 필요</td><td>새로운 제품을 추가할 때 새로운 하위 클래스 추가</td><td>새로운 제품군을 추가할 때 새로운 팩토리 추가</td></tr><tr><td>예제</td><td><code>ButtonFactory.createButton("Windows")</code></td><td><code>WindowsButtonFactory.createButton()</code></td><td><code>WindowsUIFactory.createButton()</code>, <code>WindowsUIFactory.createCheckbox()</code></td></tr></tbody></table>
+<table><thead><tr><th width="94">구분</th><th>팩토리 (Factory)</th><th>팩토리 메소드 (Factory Method) </th><th>추상 팩토리 (Abstract Factory)</th></tr></thead><tbody><tr><td>핵심 개념</td><td>객체 생성을 위한 단순한 팩토리 함수 또는 클래스</td><td>객체 생성을 위한 하위클래스에서 구현해야 하는 메서드 제공 </td><td>서로 연관된 객체 그룹을 생성하는 팩토리 제공</td></tr><tr><td>구성 요소</td><td><ul><li>팩토리 클래스 또는 함수</li><li>제품 객체</li></ul></td><td><ul><li>팩토리 클래스를 부모로 두고, 하위 클래스에서 구현 </li><li>서브클래스에서 <code>create()</code>를 구현</li></ul></td><td><ul><li>여러 개의 팩토리 메서드를 포함한 팩토리 클래스</li><li>여러 개의 제품이 생성됨</li></ul></td></tr><tr><td>사용 목적</td><td>단순한 객체 생성 방식 제공</td><td>객체 생성을 하위클래스에서 결정하도록 강제</td><td>제품 계열(Family)을 함께 생성</td></tr><tr><td>확장성</td><td>새로운 제품을 추가할 때 팩토리 로직 수정 필요</td><td>새로운 제품을 추가할 때 새로운 하위 클래스 추가</td><td>새로운 제품군을 추가할 때 새로운 팩토리 추가</td></tr><tr><td>예제</td><td><code>ButtonFactory.createButton("Windows")</code></td><td><code>WindowsButtonFactory.createButton()</code></td><td><code>WindowsUIFactory.createButton()</code>, <code>WindowsUIFactory.createCheckbox()</code></td></tr></tbody></table>
 
 
 

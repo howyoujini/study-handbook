@@ -4,18 +4,14 @@
 
 ## programming languages
 
-* [자바스크립트](programming-languages/undefined/README.md)
-  * [ES6 화살표 함수](programming-languages/undefined/es6.md)
+* [자바스크립트](programming-languages/js/README.md)
+  * [클로저](programming-languages/js/undefined.md)
+  * [ES6 화살표 함수](programming-languages/js/arrow-function.md)
+  * [자바스크립트와 메모리](programming-languages/js/undefined-1.md)
+  * [이벤트 루프](programming-languages/js/undefined-2.md)
 
 ## cs
 
-* [자료 구조](cs/data-structure/README.md)
-  * [선형](cs/data-structure/linear/README.md)
-    * [배열 (Array)](cs/data-structure/linear/array.md)
-    * [연결 리스트 (Linked List)](cs/data-structure/linear/linked-list.md)
-    * [문자열 (String)](cs/data-structure/linear/string.md)
-  * [비선형](cs/data-structure/nonlinear/README.md)
-    * [트리 (Tree)](cs/data-structure/nonlinear/tree.md)
 * [디자인 패턴](cs/undefined/README.md)
   * [싱글톤 (Singleton)](cs/undefined/undefined.md)
   * [팩토리 메서드 (Factory Method)](cs/design-pattern/factory-method.md)

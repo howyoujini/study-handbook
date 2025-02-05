@@ -4,9 +4,7 @@ description: 객체의 상태 변화를 감지하고 등록된 옵저버들에�
 
 # 옵저버 (Observer)
 
-<figure><img src="../../.gitbook/assets/observer-2x.png" alt=""><figcaption></figcaption></figure>
-
-
+<figure><img src="../../.gitbook/assets/image (1).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/observer">https://refactoring.guru/ko/design-patterns/observer</a></p></figcaption></figure>
 
 watch?
 
