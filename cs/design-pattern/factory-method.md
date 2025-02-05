@@ -20,7 +20,81 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 객체 생성을 직접 수행하는 것이 아니라, 객체 생성을 담당하는 **별도의 클래스(팩토리 클래스)**&#xB97C; 두고, 이를 통해 객체를 생성하는 방식입니다. 즉, **객체 생성 로직을 클라이언트 코드에서 분리**하여 관리하는 것입니다. 주로 **객체 생성 방식이 고정**되어 있고, 여러 서브클래스를 관리할 때 유용합니다.&#x20;
 
-소셜 로그인 인터페이스를 통해 **다양한 제 3자 로그인을 구현해보겠습니다.**
+#### ❌ 팩토리 패턴이 없을 경우 (변경 범위가 넓음)
+
+```typescript
+interface UserDto {
+  id: number;
+  name: string;
+  email: string;
+  age?: number;
+}
+
+class User {
+  constructor(private dto: UserDto) {}
+
+  getProfile(): string {
+    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}`;
+  }
+}
+
+// ❌ 클라이언트 코드에서 직접 User 객체를 생성
+const userDto: UserDto = { id: 1, name: "Ella", email: "ella@example.com" };
+const user = new User(userDto); // ⚠️ 객체 생성 방식이 변경되면 클라이언트 코드 수정 필요
+console.log(user.getProfile());
+```
+
+#### ✅ 팩토리 패턴을 적용한 경우 (변경 범위 최소화)
+
+```typescript
+// 1. User 클래스 (User 생성 방식이 변경될 가능성이 있음)
+class User {
+  constructor(private dto: UserDto) {}
+
+  getProfile(): string {
+    return `이름: ${this.dto.name}, 이메일: ${this.dto.email}`;
+  }
+}
+
+// 2. UserFactory (팩토리 클래스)
+class UserFactory {
+  static createUser(dto: UserDto): User {
+    // 👇 객체 생성 방식이 변경되어도 클라이언트 코드 수정 불필요
+    return new User(dto);
+  }
+}
+
+// 3. 클라이언트 코드 (변경 범위 최소화)
+const userDto: UserDto = { id: 1, name: "Ella", email: "ella@example.com" };
+const user = UserFactory.createUser(userDto); // ✅ 클라이언트 코드는 수정할 필요 없음
+console.log(user.getProfile());
+```
+
+#### 🔄 생성 방식이 바뀐 후 (팩토리 패턴 적용)
+
+```typescript
+// 1. UserService 추가 (새로운 생성 방식)
+class UserService {
+  static createUser(dto: UserDto): User {
+    console.log("UserService를 통해 User 생성");
+    return new User(dto);
+  }
+}
+
+// 2. UserFactory 수정 (팩토리 내부에서만 수정됨)
+class UserFactory {
+  static createUser(dto: UserDto): User {
+    return UserService.createUser(dto); // ✅ 변경 범위 최소화
+  }
+}
+
+// 3. 클라이언트 코드 (변경 필요 없음)
+const userDto: UserDto = { id: 1, name: "Alice", email: "alice@example.com" };
+const user = UserFactory.createUser(userDto);
+console.log(user.getProfile()); // "UserService를 통해 User 생성"
+```
+
+User 객체 이외에, 소셜 로그인 인터페이스를 통해 **다양한 제 3자 로그인**을 구현해보겠습니다.
 
 {% code lineNumbers="true" fullWidth="false" %}
 ```typescript
@@ -54,7 +128,7 @@ class AppleLogin implements SocialLogin {
   }
 }
 
-// 3. 팩토리 클래스 (모든 로그인 객체를 관리)
+// 3. 팩토리 클래스 (모든 로그인 객체를 관리) - OCP(개방폐쇄) 위반, SRP(단일책임) 위반
 class SocialLoginFactory {
   static createLogin(type: string): SocialLogin {
     switch (type) {
@@ -92,6 +166,7 @@ googleLogin.login(); // 구글 로그인 실행
 
 소셜 로그인 인터페이스와 소셜 로그인 추상클래스를 통해 **다양한 제 3자 로그인을 구현해보겠습니다.**
 
+{% code lineNumbers="true" %}
 ```typescript
 // 1. SocialLogin 인터페이스 (추상화)
 interface SocialLogin {
@@ -163,10 +238,11 @@ const googleLogin = googleFactory.createLogin();
 kakaoLogin.login(); // "카카오 로그인 실행"
 googleLogin.login(); // "구글 로그인 실행"
 ```
+{% endcode %}
 
 </details>
 
-<table><thead><tr><th width="141">구분</th><th width="306">팩토리 패턴 (Factory Pattern)</th><th>팩토리 메서드 패턴 (Factory Method Pattern)</th></tr></thead><tbody><tr><td>객체 생성 책임</td><td>하나의 팩토리 클래스가 생성 책임을 가짐</td><td>하위클래스에서 객체 생성 로직을 결정</td></tr><tr><td>유연성</td><td>새로운 객체 유형 추가 시 기존 팩토리 클래스 수정 필요</td><td>새로운 하위클래스를 추가하여 확장 가능 (OCP 준수)</td></tr><tr><td>설계 방식 </td><td>단순한 정적 메서드 또는 별도의 팩토리 클래스를 사용</td><td>상속을 활용해 객체 생성 방식을 변경</td></tr><tr><td>사용 예</td><td>단순한 객체 생성을 중앙 집중화할 때</td><td>다양한 객체 생성을 서브클래스에 위임할 때</td></tr></tbody></table>
+<table><thead><tr><th width="144">구분</th><th width="306">팩토리 패턴 (Factory Pattern)</th><th>팩토리 메서드 패턴 (Factory Method Pattern)</th></tr></thead><tbody><tr><td>객체 생성 책임</td><td>하나의 팩토리 클래스가 생성 책임을 가짐</td><td>하위클래스에서 객체 생성 로직을 결정</td></tr><tr><td>유연성</td><td>새로운 객체 유형 추가 시 기존 팩토리 클래스 수정 필요</td><td>새로운 하위클래스를 추가하여 확장 가능 (OCP 준수)</td></tr><tr><td>설계 방식 </td><td>단순한 정적 메서드 또는 별도의 팩토리 클래스를 사용</td><td>상속을 활용해 객체 생성 방식을 변경</td></tr><tr><td>사용 예</td><td>단순한 객체 생성을 중앙 집중화할 때</td><td>다양한 객체 생성을 하위클래스에 위임할 때</td></tr></tbody></table>
 
 
 
