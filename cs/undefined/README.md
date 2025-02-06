@@ -110,7 +110,7 @@ description: 소프트웨어를 설계하는 과정에서 자주 발생하는 �
 * 객체를 효율적으로 생성하고 관리하는 방법을 제공합니다.
 * 객체 생성 과정에서 중복을 줄이고, 유연성을 높입니다.
 
-<table><thead><tr><th width="270">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td><a href="undefined.md">Singleton (싱글톤)</a></td><td>하나의 클래스에 오직 하나의 인스턴스만 가지는 패턴</td></tr><tr><td><a href="../design-pattern/factory-method.md">Factory Method (팩토리 메서드)</a></td><td>객체 생성 주체를 하위클래스로 위임하는 패턴</td></tr><tr><td>Abstract Factory (추상 팩토리)</td><td>관련된 객체들을 생성할 수 있도록 하는 팩토리들의 집합</td></tr><tr><td>Builder (빌더)</td><td>복잡한 객체 생성을 단계적으로 진행할 수 있도록 하는 패턴</td></tr><tr><td>Prototype (프로토타입)</td><td>기존 객체를 복사하여 새로운 객체를 생성하는 패턴</td></tr></tbody></table>
+<table><thead><tr><th width="270">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td><a href="undefined.md">Singleton (싱글톤)</a></td><td>하나의 클래스에 오직 하나의 인스턴스만 가지는 패턴</td></tr><tr><td><a href="../design-pattern/factory-method.md">Factory Method (팩토리 메서드)</a></td><td>객체 생성 주체를 하위클래스로 위임하는 패턴</td></tr><tr><td><a href="../design-pattern/factory-method.md#factory-method-abstract-factory">Abstract Factory (추상 팩토리)</a></td><td>관련된 객체들을 생성할 수 있도록 하는 팩토리들의 집합</td></tr><tr><td>Builder (빌더)</td><td>복잡한 객체 생성을 단계적으로 진행할 수 있도록 하는 패턴</td></tr><tr><td>Prototype (프로토타입)</td><td>기존 객체를 복사하여 새로운 객체를 생성하는 패턴</td></tr></tbody></table>
 
 
 {% endstep %}
@@ -132,9 +132,7 @@ description: 소프트웨어를 설계하는 과정에서 자주 발생하는 �
 * 객체 간의 커뮤니케이션을 효과적으로 처리하는 패턴
 * 코드의 응집도를 높이고, 결합도를 낮추는 데 도움
 
-<table><thead><tr><th width="273">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td>Chain of Responsibility (책임 연쇄)</td><td>요청을 여러 개의 처리 객체가 연속적으로 처리하는 패턴</td></tr><tr><td>Command (커맨드)</td><td>요청을 캡슐화하여 실행 취소 기능을 제공하는 패턴</td></tr><tr><td>Interpreter (인터프리터) </td><td>특정 언어의 문법을 분석하고 실행하는 패턴</td></tr><tr><td>Iterator (이터레이터)</td><td>컬렉션 요소들을 순차적으로 탐색하는 패턴</td></tr><tr><td>Mediator (미디에이터)</td><td>객체 간의 직접적인 통신을 방지하고 중재자를 통해 조정하는 패턴</td></tr><tr><td>Memento (메멘토)</td><td>객체 상태를 저장하고 복원할 수 있는 패턴</td></tr><tr><td><a href="../design-pattern/observer.md">Observer (옵저버)</a></td><td>객체 상태 변화 시, 관련 객체들에 자동으로 알림을 보내는 패턴</td></tr><tr><td>State (스테이트) </td><td>객체의 상태에 따라 다른 행동을 수행하는 패턴</td></tr><tr><td><a href="../design-pattern/strategy.md">Strategy (전략)</a></td><td>알고리즘을 캡슐화하여 동적으로 변경할 수 있도록 하는 패턴</td></tr><tr><td>Template Method (템플릿 메서드)</td><td>알고리즘의 구조를 정의하고, 세부 사항은 서브클래스에서 구현하는 패턴</td></tr><tr><td>Visitor (비지터)</td><td>객체 구조와 별개로 연산을 추가할 수 있도록 하는 패턴</td></tr></tbody></table>
-
-
+<table><thead><tr><th width="273">디자인 패턴 이름</th><th>설명</th></tr></thead><tbody><tr><td>Chain of Responsibility (책임 연쇄)</td><td>요청을 여러 개의 처리 객체가 연속적으로 처리하는 패턴</td></tr><tr><td>Command (커맨드)</td><td>요청을 캡슐화하여 실행 취소 기능을 제공하는 패턴</td></tr><tr><td>Interpreter (인터프리터) </td><td>특정 언어의 문법을 분석하고 실행하는 패턴</td></tr><tr><td>Iterator (이터레이터)</td><td>컬렉션 요소들을 순차적으로 탐색하는 패턴</td></tr><tr><td>Mediator (미디에이터)</td><td>객체 간의 직접적인 통신을 방지하고 중재자를 통해 조정하는 패턴</td></tr><tr><td>Memento (메멘토)</td><td>객체 상태를 저장하고 복원할 수 있는 패턴</td></tr><tr><td><a href="broken-reference">Observer (옵저버)</a></td><td>객체 상태 변화 시, 관련 객체들에 자동으로 알림을 보내는 패턴</td></tr><tr><td>State (스테이트) </td><td>객체의 상태에 따라 다른 행동을 수행하는 패턴</td></tr><tr><td><a href="broken-reference">Strategy (전략)</a></td><td>알고리즘을 캡슐화하여 동적으로 변경할 수 있도록 하는 패턴</td></tr><tr><td>Template Method (템플릿 메서드)</td><td>알고리즘의 구조를 정의하고, 세부 사항은 서브클래스에서 구현하는 패턴</td></tr><tr><td>Visitor (비지터)</td><td>객체 구조와 별개로 연산을 추가할 수 있도록 하는 패턴</td></tr></tbody></table>
 {% endstep %}
 {% endstepper %}
 
