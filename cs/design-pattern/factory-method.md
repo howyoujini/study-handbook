@@ -644,26 +644,26 @@ socialLogin("Google"); // 구글 로그인 성공
 <summary>🏭 OS별 버튼 생성 - 팩토리 메서드 패턴</summary>
 
 ```typescript
-// 인터페이스 정의
+// 1. 버튼 인터페이스 정의
 abstract class Button {
   abstract render(): void;
 }
 
-// 구체적인 클래스
+// 2. 각 OS에 맞는 버튼 클래스 구현
 class WindowsButton extends Button {
   render(): void {
-    console.log("Windows 스타일 버튼 렌더링");
+    console.log("Windows 스타일의 버튼 렌더링");
   }
 }
 
 class MacOSButton extends Button {
   render(): void {
-    console.log("MacOS 스타일 버튼 렌더링");
+    console.log("MacOS 스타일의 버튼 렌더링");
   }
 }
 
-// 팩토리 메서드가 있는 클래스 (Renderer)
-abstract class ButtonFactory {
+// 3. 팩토리 메소드가 있는 렌더러 클래스
+abstract class Renderer {
   abstract createButton(): Button;
 
   render(): void {
@@ -672,22 +672,49 @@ abstract class ButtonFactory {
   }
 }
 
-// 팩토리 클래스 (각 OS별 버튼 생성)
-class WindowsButtonFactory extends ButtonFactory {
+// 4. OS에 맞는 팩토리 구현
+class WindowsRenderer extends Renderer {
   createButton(): Button {
     return new WindowsButton();
   }
 }
 
-class MacOSButtonFactory extends ButtonFactory {
+class MacOSRenderer extends Renderer {
   createButton(): Button {
     return new MacOSButton();
   }
 }
 
+// 5. 등록 기반 팩토리 구현 (OCP 적용)
+class RendererFactory {
+  private static registry: Map<string, new () => Renderer> = new Map();
+
+  static register(OS: string, rendererClass: new () => Renderer): void {
+    this.registry.set(OS, rendererClass);
+  }
+
+  static createRenderer(OS: string): Renderer {
+    const RendererClass = this.registry.get(OS);
+    if (!RendererClass) {
+      throw new Error(`지원되지 않는 OS: ${OS}`);
+    }
+    return new RendererClass();
+  }
+}
+
+// 6. OS 렌더러 등록
+RendererFactory.register("Windows", WindowsRenderer);
+RendererFactory.register("MacOS", MacOSRenderer);
+
+// 7. 클라이언트 코드
+function application(OS: string): void {
+  const renderer = RendererFactory.createRenderer(OS);
+  renderer.render();
+}
+
 // 사용 예시
-const factory: ButtonFactory = new WindowsButtonFactory();
-factory.render(); // "Windows 스타일 버튼 렌더링"
+application("Windows"); // Windows 스타일의 버튼 렌더링
+application("MacOS");   // MacOS 스타일의 버튼 렌더링
 ```
 
 </details>
