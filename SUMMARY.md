@@ -12,6 +12,7 @@
 * [디자인 패턴](cs/undefined/README.md)
   * [싱글톤 (Singleton)](cs/undefined/undefined.md)
   * [팩토리 메서드 (Factory Method)](cs/design-pattern/factory-method.md)
+  * [전략 (Strategy)](cs/design-pattern/strategy.md)
 
 ## Mathematics
 
