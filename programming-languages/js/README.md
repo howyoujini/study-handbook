@@ -1,5 +1,16 @@
 ---
 description: 웹을 동적으로 만들기 위한 인터프리터형 프로토타입 기반 객체지향 프로그래밍 언어
+layout:
+  title:
+    visible: true
+  description:
+    visible: true
+  tableOfContents:
+    visible: true
+  outline:
+    visible: false
+  pagination:
+    visible: true
 ---
 
 # 자바스크립트
