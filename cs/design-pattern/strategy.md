@@ -4,7 +4,7 @@ description: 객체의 행위를 변경할 때, 알고리즘을 캡슐화하여 
 
 # 전략 (Strategy)
 
-<figure><img src="../../.gitbook/assets/image (3).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/strategy">https://refactoring.guru/ko/design-patterns/strategy</a></p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (3) (1).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/strategy">https://refactoring.guru/ko/design-patterns/strategy</a></p></figcaption></figure>
 
 전략 패턴(Strategy Pattern)은 **객체의 행위를 변경할 때, 알고리즘을 캡슐화하여 컨텍스트 내부에서 동적으로 교체할 수 있도록 만드는 패턴**입니다. 즉, 객체가 수행하는 기능(행위)을 미리 정의된 여러 알고리즘 중 하나로 변경할 수 있도록 설계하는 방식입니다.
 

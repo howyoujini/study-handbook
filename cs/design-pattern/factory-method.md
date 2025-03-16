@@ -4,7 +4,7 @@ description: 객체 생성의 책임을 하위클래스에 위임하는 패턴
 
 # 팩토리 메서드 (Factory Method)
 
-<figure><img src="../../.gitbook/assets/image (2).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/factory-method">https://refactoring.guru/ko/design-patterns/factory-method</a></p></figcaption></figure>
+<figure><img src="../../.gitbook/assets/image (2) (1).png" alt=""><figcaption><p><a href="https://refactoring.guru/ko/design-patterns/factory-method">https://refactoring.guru/ko/design-patterns/factory-method</a></p></figcaption></figure>
 
 팩토리 메소드 패턴(Factory Method Pattern)은 객체 **생성을 캡슐화**하여, 하위클래스에서 객체의 **생성 방식을 결정하도록 하는 디자인 패턴**입니다. 즉, 객체를 직접 생성하는 것이 아니라, **객체 생성을 담당하는 메소드를 통해 객체를 반환**하도록 합니다. 이 패턴을 활용하면 클라이언트 코드가 특정 클래스의 인스턴스를 직접 생성하지 않고, 추상화된 인터페이스를 통해 객체를 생성할 수 있습니다.
 

@@ -16,4 +16,4 @@
 
 ## Mathematics
 
-* [최대공약수(gcd)와 최소공배수()](mathematics/gcd.md)
+* [최대공약수(GCD)와 최소공배수(LCM)](mathematics/gcd-lcm.md)
