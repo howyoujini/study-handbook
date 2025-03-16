@@ -36,6 +36,8 @@ description: 객체의 행위를 변경할 때, 알고리즘을 캡슐화하여 
 
 전략 패턴을 활용하여 **소셜 로그인 시스템**을 설계해보겠습니다. 사용자는 Google, Kakao, GitHub 등의 로그인 방법을 선택할 수 있으며, 각 로그인 방식은 전략 패턴을 이용해 독립적으로 구현됩니다.
 
+#### 소셜 로그인
+
 #### 1. 소셜 로그인 인터페이스 정의
 
 ```typescript
@@ -97,6 +99,84 @@ loginContext.executeLogin("Ella");  // "Ella 님이 Kakao로 로그인했습니�
 ```
 
 전략 패턴을 활용하면 객체의 행위를 동적으로 변경할 수 있어 유지보수성과 확장성이 향상됩니다. 위 예제처럼 **로그인 방식뿐만 아니라 검색 필터링, 결제 방식, 추천 시스템** 등 다양한 곳에서 활용할 수 있습니다.
+
+***
+
+#### 1. 다양한 플랫폼별 프로토타입 동작 구현
+
+만약 여러분의 서비스가 **웹, 모바일, 태블릿 등 여러 플랫폼**을 지원한다고 가정해봅시다. 각 플랫폼마다 사용자 경험과 인터랙션 패턴이 다를 수 있으므로, 플랫폼별로 다른 동작 방식을 전략 패턴을 통해 구현할 수 있습니다. 이를 통해 코드의 재사용성을 높이고, 유지보수를 용이하게 할 수 있습니다.
+
+```typescript
+interface InteractionStrategy {
+  executeInteraction(): void;
+}
+
+class WebInteraction implements InteractionStrategy {
+  executeInteraction(): void {
+    console.log("웹 인터랙션 실행");
+  }
+}
+
+class MobileInteraction implements InteractionStrategy {
+  executeInteraction(): void {
+    console.log("모바일 인터랙션 실행");
+  }
+}
+
+class InteractionContext {
+  private strategy: InteractionStrategy;
+
+  constructor(strategy: InteractionStrategy) {
+    this.strategy = strategy;
+  }
+
+  setStrategy(strategy: InteractionStrategy): void {
+    this.strategy = strategy;
+  }
+
+  execute(): void {
+    this.strategy.executeInteraction();
+  }
+}
+```
+
+이제 다양한 플랫폼에서 프로토파이 인터랙션을 실행할 수 있습니다.
+
+```typescript
+const interaction = new InteractionContext(new WebInteraction());
+interaction.execute();  // "웹 인터랙션 실행"
+
+interaction.setStrategy(new MobileInteraction());
+interaction.execute();  // "모바일 인터랙션 실행"
+```
+
+#### 사용자 정의 인터랙션 관리
+
+사용자 요구에 따라 인터랙션 방식이 달라질 수 있습니다. 전략 패턴을 적용하면 특정 이벤트 발생 시 실행할 전략을 동적으로 선택할 수 있습니다.
+
+```typescript
+class TapInteraction implements InteractionStrategy {
+  executeInteraction(): void {
+    console.log("탭 이벤트 실행");
+  }
+}
+
+class SwipeInteraction implements InteractionStrategy {
+  executeInteraction(): void {
+    console.log("스와이프 이벤트 실행");
+  }
+}
+```
+
+이제 사용자가 원하는 방식으로 인터랙션을 변경할 수 있습니다.
+
+```typescript
+interaction.setStrategy(new TapInteraction());
+interaction.execute();  // "탭 이벤트 실행"
+
+interaction.setStrategy(new SwipeInteraction());
+interaction.execute();  // "스와이프 이벤트 실행"
+```
 
 
 
